@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOC Terminal</title>
   <style>
     body {
@@ -12,6 +12,7 @@
       margin: 0;
       padding: 20px;
     }
+
     #terminal {
       width: 640px;
       margin: 0 auto;
@@ -20,11 +21,13 @@
       background-color: #000;
       box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
     }
+
     #output {
       white-space: pre-wrap;
       height: 300px;
       overflow: hidden;
     }
+
     #input {
       width: 100%;
       background: #000;
@@ -38,10 +41,8 @@
 </head>
 <body>
   <div id="terminal">
-    <div id="output">Initializing Station 7...
-Type HELP to begin.
-> </div>
-    <input type="text" id="input" autofocus onkeydown="processInput(event)">
+    <div id="output">Initializing Station 7...\nType HELP to begin.\n> </div>
+    <input type="text" id="input" autofocus onkeydown="processInput(event)" />
   </div>
 
   <script>
@@ -58,7 +59,7 @@ Type HELP to begin.
     function processInput(e) {
       if (e.key === 'Enter') {
         const command = input.value.trim();
-        output.innerText += command + '\n';
+        output.innerText += command + '\\n';
         handleCommand(command);
         input.value = '';
       }
@@ -67,21 +68,21 @@ Type HELP to begin.
     function handleCommand(cmd) {
       const command = cmd.toUpperCase();
       if (command === 'HELP') {
-        output.innerText += 'AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View file\nCLEAR - Clear screen\n';
+        output.innerText += 'AVAILABLE COMMANDS:\\nDIR - List files\\nOPEN <FILENAME> - View file\\nCLEAR - Clear screen\\n';
       } else if (command === 'DIR') {
-        output.innerText += files.map(f => '- ' + f).join('\n') + '\n';
+        output.innerText += files.map(f => '- ' + f).join('\\n') + '\\n';
       } else if (command.startsWith('OPEN ')) {
         const filename = cmd.slice(5).trim();
         if (files.includes(filename)) {
           window.open(`docs/${filename}`, '_blank');
-          output.innerText += `Opening ${filename}...\n`;
+          output.innerText += `Opening ${filename}...\\n`;
         } else {
-          output.innerText += `File not found: ${filename}\n`;
+          output.innerText += `File not found: ${filename}\\n`;
         }
       } else if (command === 'CLEAR') {
         output.innerText = '> ';
       } else {
-        output.innerText += `Unknown command: ${cmd}\n`;
+        output.innerText += `Unknown command: ${cmd}\\n`;
       }
     }
   </script>
