@@ -10,16 +10,46 @@
   <header>
     <h1>Bureau of Ontological Consistency</h1>
     <nav>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
+      <a href="#" onclick="openModal('about-modal')">About</a>
+      <a href="#" onclick="openModal('contact-modal')">Contact</a>
     </nav>
   </header>
+
   <main>
     <section>
       <p>Status: ONLINE — Station 7 Active</p>
       <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
     </section>
   </main>
+
   <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+
+  <!-- About Modal -->
+  <div id="about-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('about-modal')">&times;</span>
+      <h2>About</h2>
+      <p>The Bureau of Ontological Consistency (B.O.C.) was formally established in 1998 to ensure continuity of recursion-aware field systems and investigate causal integrity breaches.</p>
+    </div>
+  </div>
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('contact-modal')">&times;</span>
+      <h2>Contact</h2>
+      <p>Send secure inquiries to: <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a></p>
+    </div>
+  </div>
+
+  <!-- Modal Script -->
+  <script>
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+  </script>
 </body>
 </html>
