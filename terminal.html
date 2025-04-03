@@ -47,23 +47,19 @@
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...
-</div>
+  <div id="terminal">INITIALIZING STATION 7...\n</div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
   <audio id="bleen-audio" src="bleen_dialup.wav" autoplay></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
     const input = document.getElementById('input');
-    const files = [
-      "BOC-42-R_Artifact_Incident_Form.pdf",
-      "BOC-73-RC_Recursion_Event_Report.pdf",
-      "Field_Log_473QRTA.pdf",
-      "NTIA_Field_Memo_BVHA_Recursion.pdf"
-    ];
 
     const audio = document.getElementById('bleen-audio');
-    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, 10300);
+    setTimeout(() => {
+      audio.pause();
+      audio.currentTime = 0;
+    }, 10300); // Fixed 10.3 seconds
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
@@ -114,22 +110,43 @@
 
     function handleCommand(cmd) {
       const c = cmd.toUpperCase();
-      if (c === "HELP") {
-        terminal.innerText += "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\n";
-      } else if (c === "DIR") {
-        terminal.innerText += files.map(f => `- ${f}`).join("\n") + "\n";
-      } else if (c.startsWith("OPEN ")) {
-        const filename = cmd.slice(5).trim();
-        if (files.includes(filename)) {
-          terminal.innerText += `Opening ${filename}...\n`;
-          window.open(`docs/${filename}`, '_blank');
-        } else {
-          terminal.innerText += `File not found: ${filename}\n`;
-        }
-      } else if (c === "CLEAR") {
+      const delay = (text) => setTimeout(() => {
+        terminal.innerText += text + "\n";
+      }, Math.random() * 200 + 100);
+
+      const sysResponses = {
+        "WHOAMI": "agent_b.oc",
+        "UPTIME": "System up for 394 hours 17 minutes",
+        "PING STATION_5": "Request timed out.",
+        "PING 127.0.0.1": "Reply from 127.0.0.1: bytes=32 time<1ms TTL=64",
+        "TRACEROUTE STATION7.NET": [
+          "Tracing route to station7.net...",
+          "1   192.168.0.1     2ms",
+          "2   10.42.73.1      [corrupt hop]",
+          "3   * * *           Request timed out."
+        ],
+        "SSH ROOT@127.0.0.1": "Connection refused (port 22)",
+        "FORMAT C:": "Operation denied: protected volume",
+        "CD ..": "Segmentation fault (core dumped)",
+        "LS /LOGS/RECURSION": "Error: Access to /logs/recursion denied (permission 740)",
+        "RUN SYSTEM_CHECK": "Command not recognized",
+        "HELP": "STANDARD COMMANDS:\nWHOAMI\nUPTIME\nPING <IP/host>\nTRACEROUTE <host>\nCD <dir>\nLS <dir>\nFORMAT <disk>\nSSH <user@host>\nCLEAR"
+      };
+
+      if (c === "CLEAR") {
         terminal.innerText = "";
+        return;
+      }
+
+      if (sysResponses[c]) {
+        const response = sysResponses[c];
+        if (Array.isArray(response)) {
+          response.forEach((line, i) => setTimeout(() => terminal.innerText += line + "\n", i * 250));
+        } else {
+          delay(response);
+        }
       } else {
-        terminal.innerText += `Unknown command: ${cmd}\n`;
+        delay("Error: Command not recognized or malformed syntax");
       }
     }
   </script>
