@@ -2,58 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bureau of Ontological Consistency</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header>
+    <h1>Bureau of Ontological Consistency</h1>
+    <nav>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <p>Status: ONLINE — Station 7 Active</p>
+      <p>
+        Field communications may be routed through
+        <a href="mailto:oversight@bureauofontologicalconsistency.org">
+          oversight@bureauofontologicalconsistency.org
+        </a>.
+      </p>
+    </section>
+  </main>
 
-  <div id="nav">
-    <span id="nav-left">Bureau of Ontological Consistency</span>
-    <span id="nav-right">
-      <a href="#" onclick="showOverlay('about')">About</a> |
-      <a href="#" onclick="showOverlay('contact')">Contact</a>
-    </span>
-  </div>
-
-  <div id="status">Status: ONLINE — Station 7 Active</div>
-
-  <!-- Terminal Icon -->
-  <a href="terminal.html" id="terminal-icon" title="Legacy Terminal Access">
-    <img src="terminal_icon.png" alt="terminal icon" />
-  </a>
-
-  <!-- Overlay System -->
-  <div id="overlay" class="hidden">
-    <div id="overlay-content">
-      <span id="overlay-close" onclick="hideOverlay()">✖</span>
-      <div id="about" class="overlay-section hidden">
-        <h2>About the Bureau</h2>
-        <p>
-          The Bureau of Ontological Consistency (B.O.C.) serves as a stabilizing archival node across variant threads.
-          Our mission is to observe, log, and, when necessary, intervene in recursive events, recursion bleed,
-          temporal dissonance, and other non-causal phenomena.
-        </p>
-      </div>
-      <div id="contact" class="overlay-section hidden">
-        <h2>Contact Oversight</h2>
-        <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org?subject=Field Report">oversight@bureauofontologicalconsistency.org</a>.</p>
-        <p>Submissions are forwarded securely to the assigned registrar (Demitrius13@bureauofontologicalconsistency.org).</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function showOverlay(section) {
-      document.getElementById('overlay').classList.remove('hidden');
-      document.querySelectorAll('.overlay-section').forEach(el => el.classList.add('hidden'));
-      document.getElementById(section).classList.remove('hidden');
-    }
-
-    function hideOverlay() {
-      document.getElementById('overlay').classList.add('hidden');
-    }
-  </script>
-
+  <!-- Subtle Terminal Icon (acts as hidden portal) -->
+  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
 </body>
 </html>
