@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -10,16 +10,35 @@
   <header>
     <h1>Bureau of Ontological Consistency</h1>
     <nav>
+      <a href="#" onclick="toggleContactBox(event)">Contact</a>
       <a href="#">About</a>
-      <a href="#">Contact</a>
     </nav>
   </header>
+
   <main>
     <section>
       <p>Status: ONLINE — Station 7 Active</p>
       <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
     </section>
   </main>
+
   <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+
+  <!-- ✅ Simple Contact Box -->
+  <div id="contact-box" style="display: none;" class="contact-box">
+    <div class="contact-content">
+      <span class="close" onclick="toggleContactBox(event)">&times;</span>
+      <p>Contact: <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a></p>
+    </div>
+  </div>
+
+  <!-- ✅ Contact Box Toggle Script -->
+  <script>
+    function toggleContactBox(event) {
+      event.preventDefault();
+      const box = document.getElementById('contact-box');
+      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+  </script>
 </body>
 </html>
