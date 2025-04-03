@@ -1,4 +1,4 @@
-/* Base styling for BOC */
+/* Base styling for BOC landing page */
 body {
   margin: 0;
   padding: 0;
@@ -9,7 +9,7 @@ body {
 }
 
 header {
-  background: #111;
+  background: rgba(0, 0, 0, 0.7);
   padding: 20px;
   text-align: center;
   border-bottom: 1px solid #333;
@@ -40,6 +40,11 @@ nav a:hover {
 main {
   padding: 40px;
   text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  margin: 60px auto;
+  width: 60%;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(0, 255, 225, 0.2);
 }
 
 .terminal-icon {
