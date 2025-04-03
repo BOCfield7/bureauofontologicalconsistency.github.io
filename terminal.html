@@ -3,23 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bureau of Ontological Consistency</title>
-  <link rel="stylesheet" href="style.css">
+  <title>BOC Terminal</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #00FF00;
+      font-family: monospace;
+      margin: 0;
+      padding: 20px;
+    }
+    #terminal {
+      width: 640px;
+      margin: 0 auto;
+      border: 2px solid #00FF00;
+      padding: 20px;
+      background-color: #000;
+      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
+    }
+    #output {
+      white-space: pre-wrap;
+      height: 300px;
+      overflow: hidden;
+    }
+    #input {
+      width: 100%;
+      background: #000;
+      border: none;
+      color: #00FF00;
+      font-family: monospace;
+      font-size: 1em;
+      outline: none;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Bureau of Ontological Consistency</h1>
-    <nav>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
-  <main>
-    <section>
-      <p>Status: ONLINE — Station 7 Active</p>
-      <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
-    </section>
-  </main>
-  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+  <div id="terminal">
+    <div id="output">Initializing Station 7...
+Type HELP to begin.
+> </div>
+    <input type="text" id="input" autofocus onkeydown="processInput(event)">
+  </div>
+
+  <script>
+    const output = document.getElementById('output');
+    const input = document.getElementById('input');
+
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
+
+    function processInput(e) {
+      if (e.key === 'Enter') {
+        const command = input.value.trim();
+        output.innerText += command + '\n';
+        handleCommand(command);
+        input.value = '';
+      }
+    }
+
+    function handleCommand(cmd) {
+      const command = cmd.toUpperCase();
+      if (command === 'HELP') {
+        output.innerText += 'AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View file\nCLEAR - Clear screen\n';
+      } else if (command === 'DIR') {
+        output.innerText += files.map(f => '- ' + f).join('\n') + '\n';
+      } else if (command.startsWith('OPEN ')) {
+        const filename = cmd.slice(5).trim();
+        if (files.includes(filename)) {
+          window.open(`docs/${filename}`, '_blank');
+          output.innerText += `Opening ${filename}...\n`;
+        } else {
+          output.innerText += `File not found: ${filename}\n`;
+        }
+      } else if (command === 'CLEAR') {
+        output.innerText = '> ';
+      } else {
+        output.innerText += `Unknown command: ${cmd}\n`;
+      }
+    }
+  </script>
 </body>
 </html>
