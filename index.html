@@ -11,32 +11,49 @@
     <h1>Bureau of Ontological Consistency</h1>
     <nav>
       <a href="#" onclick="toggleContactBox(event)">Contact</a>
-      <a href="#">About</a>
+      <a href="#" onclick="toggleAboutBox(event)">About</a>
     </nav>
   </header>
 
   <main>
     <section>
       <p>Status: ONLINE — Station 7 Active</p>
-      <p>Station Communications Portal. Field: STABLE. Thread: LOCKED</a>.</p>
+      <p>Station Communications Portal. Field: STABLE. Thread: LOCKED.</p>
     </section>
   </main>
 
   <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
 
-  <!-- ✅ Simple Contact Box -->
+  <!-- ✅ Contact Box -->
   <div id="contact-box" style="display: none;" class="contact-box">
     <div class="contact-content">
       <span class="close" onclick="toggleContactBox(event)">&times;</span>
-      <p>Contact: <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a></p>
+      <p>Station Communications Portal. Field: STABLE. Thread: LOCKED</a></p>
     </div>
   </div>
 
-  <!-- ✅ Contact Box Toggle Script -->
+  <!-- ✅ About Box -->
+  <div id="about-box" style="display: none;" class="about-box">
+    <div class="about-content">
+      <span class="close" onclick="toggleAboutBox(event)">&times;</span>
+      <p><strong>Purpose & Scope:</strong></p>
+      <p>The Bureau of Ontological Consistency (B.O.C.) exists to monitor, record, and stabilize recursive artifacts and temporal thread anomalies across authorized threads.</p>
+      <p>All actions are in accordance with internal directive 7-Lambda, under the authority of the Station Oversight Protocol. No external review required.</p>
+      <p>⚠ Inquiries regarding event origin, system entropy, or field destabilization will not receive acknowledgment.</p>
+    </div>
+  </div>
+
+  <!-- ✅ UI Control Script -->
   <script>
     function toggleContactBox(event) {
       event.preventDefault();
       const box = document.getElementById('contact-box');
+      box.style.display = box.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function toggleAboutBox(event) {
+      event.preventDefault();
+      const box = document.getElementById('about-box');
       box.style.display = box.style.display === 'block' ? 'none' : 'block';
     }
   </script>
