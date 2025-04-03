@@ -51,5 +51,25 @@
       document.getElementById(id).classList.add('hidden');
     }
   </script>
+  <!-- Modal Script -->
+<script>
+  function openModal(id) {
+    document.getElementById(id).classList.remove('hidden');
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.add('hidden');
+  }
+
+  // ESC key to close any open modal
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+      });
+    }
+  });
+</script>
+
 </body>
 </html>
