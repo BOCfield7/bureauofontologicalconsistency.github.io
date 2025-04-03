@@ -1,145 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOC Terminal Interface</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bureau of Ontological Consistency</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    #terminalContainer {
-      display: none;
-      position: fixed;
-      top: 10%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 400px;
-      background: #000;
-      color: #00FF00;
-      font-family: monospace;
+    body {
+      background: url('station7_background.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #f4f4f4;
+    }
+    header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2em;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
       padding: 10px;
-      border: 2px solid #00FF00;
-      z-index: 1000;
     }
-    #terminalHeader {
-      background-color: #111;
-      color: #0f0;
-      padding: 5px;
-      font-size: 0.9em;
-      border-bottom: 1px solid #0f0;
-    }
-    #terminalOutput {
-      height: 330px;
-      overflow: hidden;
-      white-space: pre-wrap;
-    }
-    #terminalInput {
-      border: none;
-      background: black;
-      color: #00FF00;
-      width: 100%;
-      outline: none;
-      font-family: monospace;
+    nav a {
+      color: #f4f4f4;
+      text-decoration: none;
+      margin: 0 15px;
       font-size: 1em;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .content {
+      padding: 40px;
+      text-align: center;
+      min-height: 70vh;
+    }
+    .terminal-icon {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 32px;
+      height: 32px;
+      background: url('terminal_icon.png') no-repeat center center;
+      background-size: contain;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+    .terminal-icon:hover {
+      opacity: 1;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>B.O.C. Node Access Interface</h1>
-    <nav>
-      <a href="#" onclick="showTerminal()">Terminal</a>
-      <a href="docs/">Documents</a>
-    </nav>
+    <h1>Bureau of Ontological Consistency</h1>
   </header>
-
-  <div id="terminalContainer">
-    <div id="terminalHeader">B.O.C. Secure Shell v1.07 - Station 7</div>
-    <div id="terminalOutput"></div>
-    <input type="text" id="terminalInput" autofocus onkeydown="handleCommand(event)" />
+  <nav>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+    <!-- Removed Terminal link here -->
+  </nav>
+  <div class="content">
+    <p>Status: ONLINE — Station 7 Active</p>
+    <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
   </div>
-
-  <script>
-    const terminalContainer = document.getElementById("terminalContainer");
-    const terminalOutput = document.getElementById("terminalOutput");
-    const terminalInput = document.getElementById("terminalInput");
-
-    const helpText = `Available Commands:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\nEXIT - Close terminal\n`;
-
-    const files = [
-      "BOC-42-R_Artifact_Incident_Form.pdf",
-      "BOC-73-RC_Recursion_Event_Report.pdf",
-      "Field_Log_473QRTA.pdf",
-      "NTIA_Field_Memo_BVHA_Recursion.pdf"
-    ];
-
-    let commandHistory = [];
-    let historyIndex = -1;
-
-    function showTerminal() {
-      terminalContainer.style.display = "block";
-      terminalInput.focus();
-      autoType("Boot sequence initiated...\nInitializing node...\nStation 7 Secure Connection Established.\nType HELP for list of commands.\n> ");
-    }
-
-    function autoType(text, i = 0) {
-      if (i < text.length) {
-        terminalOutput.innerHTML += text.charAt(i);
-        setTimeout(() => autoType(text, i + 1), 30);
-      }
-    }
-
-    function handleCommand(e) {
-      if (e.key === "Enter") {
-        const input = terminalInput.value.trim();
-        commandHistory.push(input);
-        historyIndex = commandHistory.length;
-        terminalOutput.innerHTML += input + "\n";
-        processCommand(input);
-        terminalInput.value = "";
-      } else if (e.key === "ArrowUp") {
-        if (historyIndex > 0) {
-          historyIndex--;
-          terminalInput.value = commandHistory[historyIndex];
-        }
-      } else if (e.key === "ArrowDown") {
-        if (historyIndex < commandHistory.length - 1) {
-          historyIndex++;
-          terminalInput.value = commandHistory[historyIndex];
-        } else {
-          terminalInput.value = "";
-        }
-      }
-    }
-
-    function processCommand(input) {
-      const [cmd, ...args] = input.split(" ");
-      switch (cmd.toUpperCase()) {
-        case "HELP":
-          terminalOutput.innerHTML += helpText + "> ";
-          break;
-        case "DIR":
-          terminalOutput.innerHTML += files.map(f => f).join("\n") + "\n> ";
-          break;
-        case "OPEN":
-          const filename = args.join(" ");
-          if (files.includes(filename)) {
-            window.open(`docs/${filename}`, '_blank');
-            terminalOutput.innerHTML += `Opening ${filename}...\n> `;
-          } else {
-            terminalOutput.innerHTML += `File not found: ${filename}\n> `;
-          }
-          break;
-        case "CLEAR":
-          terminalOutput.innerHTML = "> ";
-          break;
-        case "EXIT":
-          terminalContainer.style.display = "none";
-          break;
-        default:
-          terminalOutput.innerHTML += `Unrecognized command: ${cmd}\n> `;
-      }
-    }
-  </script>
+  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
 </body>
 </html>
