@@ -2,77 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bureau of Ontological Consistency</title>
+  <title>BOC Terminal Interface</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background: url('station7_background.png') no-repeat center center fixed;
-      background-size: cover;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #f4f4f4;
+    #terminal {
+      background-color: #000;
+      color: #33ff33;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 2em;
+      width: 80%;
+      max-width: 800px;
+      margin: auto;
+      margin-top: 3em;
+      border-radius: 5px;
     }
-    header {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      text-align: center;
-      border-bottom: 1px solid #333;
+    #output {
+      white-space: pre-wrap;
+      min-height: 300px;
     }
-    h1 {
-      margin: 0;
-      font-size: 2em;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-    }
-    nav a {
-      color: #f4f4f4;
-      text-decoration: none;
-      margin: 0 15px;
-      font-size: 1em;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .content {
-      padding: 40px;
-      text-align: center;
-      min-height: 70vh;
-    }
-    .terminal-icon {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 32px;
-      height: 32px;
-      background: url('terminal_icon.png') no-repeat center center;
-      background-size: contain;
-      cursor: pointer;
-      opacity: 0.7;
-    }
-    .terminal-icon:hover {
-      opacity: 1;
+    input[type=text] {
+      background-color: #000;
+      color: #33ff33;
+      border: none;
+      width: 100%;
+      font-family: inherit;
+      font-size: inherit;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Bureau of Ontological Consistency</h1>
-  </header>
-  <nav>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-    <!-- Removed Terminal link here -->
-  </nav>
-  <div class="content">
-    <p>Status: ONLINE — Station 7 Active</p>
-    <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
+  <div id="terminal">
+    <div id="output">
+B.O.C. Node Access Terminal v1.03
+Status: ONLINE  |  Sector: 7-Active
+
+Type HELP for list of available commands
+    </div>
+    <div>
+      &gt; <input type="text" id="command" autofocus>
+    </div>
   </div>
-  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+  <script>
+    const output = document.getElementById('output');
+    const input = document.getElementById('command');
+
+    async function getDocsList() {
+      const res = await fetch('/docs/index.json');
+      return await res.json();
+    }
+
+    function printLine(text = '') {
+      output.innerText += `\n${text}`;
+    }
+
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim().toUpperCase();
+        printLine(`> ${cmd}`);
+        input.value = '';
+
+        if (cmd === 'HELP') {
+          printLine('Available Commands:\n  DIR - List available documents\n  OPEN [filename] - View a document\n  CLEAR - Reset terminal');
+        } else if (cmd === 'DIR') {
+          const files = await getDocsList();
+          printLine('Directory Listing (/docs):');
+          files.forEach(file => {
+            printLine(`  ${file.name}`);
+          });
+        } else if (cmd.startsWith('OPEN ')) {
+          const filename = cmd.substring(5).trim();
+          const files = await getDocsList();
+          const match = files.find(f => f.name.toUpperCase() === filename);
+          if (match) {
+            window.open(match.path, '_blank');
+          } else {
+            printLine('ERROR: File not found');
+          }
+        } else if (cmd === 'CLEAR') {
+          output.innerText = 'B.O.C. Node Access Terminal v1.03\nStatus: ONLINE  |  Sector: 7-Active\n\nType HELP for list of available commands';
+        } else {
+          printLine('Unrecognized command. Type HELP.');
+        }
+      }
+    });
+  </script>
 </body>
 </html>
