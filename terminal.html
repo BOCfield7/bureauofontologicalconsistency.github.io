@@ -1,90 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOC Terminal Interface</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <style>
-    #terminal {
-      background-color: #000;
-      color: #33ff33;
-      font-family: 'Courier New', Courier, monospace;
-      padding: 2em;
-      width: 80%;
-      max-width: 800px;
-      margin: auto;
-      margin-top: 3em;
-      border-radius: 5px;
+    #terminalContainer {
+      display: none;
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 400px;
+      background: #000;
+      color: #00FF00;
+      font-family: monospace;
+      padding: 10px;
+      border: 2px solid #00FF00;
+      z-index: 1000;
     }
-    #output {
+    #terminalHeader {
+      background-color: #111;
+      color: #0f0;
+      padding: 5px;
+      font-size: 0.9em;
+      border-bottom: 1px solid #0f0;
+    }
+    #terminalOutput {
+      height: 330px;
+      overflow: hidden;
       white-space: pre-wrap;
-      min-height: 300px;
     }
-    input[type=text] {
-      background-color: #000;
-      color: #33ff33;
+    #terminalInput {
       border: none;
+      background: black;
+      color: #00FF00;
       width: 100%;
-      font-family: inherit;
-      font-size: inherit;
+      outline: none;
+      font-family: monospace;
+      font-size: 1em;
     }
   </style>
 </head>
 <body>
-  <div id="terminal">
-    <div id="output">
-B.O.C. Node Access Terminal v1.03
-Status: ONLINE  |  Sector: 7-Active
+  <header>
+    <h1>B.O.C. Node Access Interface</h1>
+    <nav>
+      <a href="#" onclick="showTerminal()">Terminal</a>
+      <a href="docs/">Documents</a>
+    </nav>
+  </header>
 
-Type HELP for list of available commands
-    </div>
-    <div>
-      &gt; <input type="text" id="command" autofocus>
-    </div>
+  <div id="terminalContainer">
+    <div id="terminalHeader">B.O.C. Secure Shell v1.07 - Station 7</div>
+    <div id="terminalOutput"></div>
+    <input type="text" id="terminalInput" autofocus onkeydown="handleCommand(event)" />
   </div>
+
   <script>
-    const output = document.getElementById('output');
-    const input = document.getElementById('command');
+    const terminalContainer = document.getElementById("terminalContainer");
+    const terminalOutput = document.getElementById("terminalOutput");
+    const terminalInput = document.getElementById("terminalInput");
 
-    async function getDocsList() {
-      const res = await fetch('/docs/index.json');
-      return await res.json();
+    const helpText = `Available Commands:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\nEXIT - Close terminal\n`;
+
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
+
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    function showTerminal() {
+      terminalContainer.style.display = "block";
+      terminalInput.focus();
+      autoType("Boot sequence initiated...\nInitializing node...\nStation 7 Secure Connection Established.\nType HELP for list of commands.\n> ");
     }
 
-    function printLine(text = '') {
-      output.innerText += `\n${text}`;
+    function autoType(text, i = 0) {
+      if (i < text.length) {
+        terminalOutput.innerHTML += text.charAt(i);
+        setTimeout(() => autoType(text, i + 1), 30);
+      }
     }
 
-    input.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim().toUpperCase();
-        printLine(`> ${cmd}`);
-        input.value = '';
-
-        if (cmd === 'HELP') {
-          printLine('Available Commands:\n  DIR - List available documents\n  OPEN [filename] - View a document\n  CLEAR - Reset terminal');
-        } else if (cmd === 'DIR') {
-          const files = await getDocsList();
-          printLine('Directory Listing (/docs):');
-          files.forEach(file => {
-            printLine(`  ${file.name}`);
-          });
-        } else if (cmd.startsWith('OPEN ')) {
-          const filename = cmd.substring(5).trim();
-          const files = await getDocsList();
-          const match = files.find(f => f.name.toUpperCase() === filename);
-          if (match) {
-            window.open(match.path, '_blank');
-          } else {
-            printLine('ERROR: File not found');
-          }
-        } else if (cmd === 'CLEAR') {
-          output.innerText = 'B.O.C. Node Access Terminal v1.03\nStatus: ONLINE  |  Sector: 7-Active\n\nType HELP for list of available commands';
+    function handleCommand(e) {
+      if (e.key === "Enter") {
+        const input = terminalInput.value.trim();
+        commandHistory.push(input);
+        historyIndex = commandHistory.length;
+        terminalOutput.innerHTML += input + "\n";
+        processCommand(input);
+        terminalInput.value = "";
+      } else if (e.key === "ArrowUp") {
+        if (historyIndex > 0) {
+          historyIndex--;
+          terminalInput.value = commandHistory[historyIndex];
+        }
+      } else if (e.key === "ArrowDown") {
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          terminalInput.value = commandHistory[historyIndex];
         } else {
-          printLine('Unrecognized command. Type HELP.');
+          terminalInput.value = "";
         }
       }
-    });
+    }
+
+    function processCommand(input) {
+      const [cmd, ...args] = input.split(" ");
+      switch (cmd.toUpperCase()) {
+        case "HELP":
+          terminalOutput.innerHTML += helpText + "> ";
+          break;
+        case "DIR":
+          terminalOutput.innerHTML += files.map(f => f).join("\n") + "\n> ";
+          break;
+        case "OPEN":
+          const filename = args.join(" ");
+          if (files.includes(filename)) {
+            window.open(`docs/${filename}`, '_blank');
+            terminalOutput.innerHTML += `Opening ${filename}...\n> `;
+          } else {
+            terminalOutput.innerHTML += `File not found: ${filename}\n> `;
+          }
+          break;
+        case "CLEAR":
+          terminalOutput.innerHTML = "> ";
+          break;
+        case "EXIT":
+          terminalContainer.style.display = "none";
+          break;
+        default:
+          terminalOutput.innerHTML += `Unrecognized command: ${cmd}\n> `;
+      }
+    }
   </script>
 </body>
 </html>
