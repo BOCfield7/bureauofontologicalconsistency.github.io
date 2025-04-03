@@ -1,15 +1,10 @@
 /* Core Modern Aesthetic */
 body {
-  background: url('station7_background.png') no-repeat center center fixed;
-  background-size: cover;
-  font-family: Arial, sans-serif;
   margin: 0;
-  padding: 0;
-  color: #f4f4f4;
-  z-index: 0;
-  position: relative;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f7;
+  color: #1a1a1a;
 }
-
 
 header {
   background-color: #222;
