@@ -7,26 +7,57 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>Bureau of Ontological Consistency</h1>
-    <nav>
-      <a href="#">About</a>
-      <a href="#">Contact</a>
-    </nav>
-  </header>
-  <main>
-    <section>
-      <p>Status: ONLINE — Station 7 Active</p>
-      <p>
-        Field communications may be routed through
-        <a href="mailto:oversight@bureauofontologicalconsistency.org">
-          oversight@bureauofontologicalconsistency.org
-        </a>.
-      </p>
-    </section>
-  </main>
+  <!-- Top Right Status -->
+  <div id="status">Status: ONLINE — Station 7 Active</div>
 
-  <!-- Subtle Terminal Icon (acts as hidden portal) -->
-  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#" onclick="loadSplash('about')">About</a></li>
+      <li><a href="#" onclick="loadSplash('contact')">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Terminal Icon Link -->
+  <a href="terminal.html" id="terminal-icon" title="legacy terminal access"></a>
+
+  <!-- Splash Content Area -->
+  <div id="splash-container" class="hidden">
+    <div id="splash-content"></div>
+    <button onclick="closeSplash()">Close</button>
+  </div>
+
+  <script>
+    function loadSplash(type) {
+      const splash = document.getElementById("splash-container");
+      const content = document.getElementById("splash-content");
+
+      if (type === "about") {
+        content.innerHTML = `
+          <h2>About the Bureau</h2>
+          <p>
+            The Bureau of Ontological Consistency was established to monitor, document,
+            and intervene in recursive or emergent phenomena affecting cross-thread coherence.
+            It operates with limited jurisdiction across convergent domains.
+          </p>
+        `;
+      } else if (type === "contact") {
+        content.innerHTML = `
+          <h2>Contact Oversight</h2>
+          <p>
+            Field communications may be routed through
+            <a href="mailto:Demitrius13@bureauofontologicalconsistency.org?subject=Oversight">oversight@bureauofontologicalconsistency.org</a>.
+          </p>
+        `;
+      }
+
+      splash.classList.remove("hidden");
+    }
+
+    function closeSplash() {
+      document.getElementById("splash-container").classList.add("hidden");
+    }
+  </script>
 </body>
 </html>
