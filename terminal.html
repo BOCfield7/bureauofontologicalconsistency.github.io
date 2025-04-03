@@ -3,88 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <title>BOC Terminal Interface</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    #terminal {
+    body {
       background-color: #000;
-      color: #33ff33;
-      font-family: 'Courier New', Courier, monospace;
-      padding: 2em;
-      width: 80%;
-      max-width: 800px;
-      margin: auto;
-      margin-top: 3em;
-      border-radius: 5px;
+      color: #00FF00;
+      font-family: monospace;
+      margin: 0;
+      padding: 20px;
     }
-    #output {
+    #terminalContainer {
+      width: 640px;
+      height: 480px;
+      background-color: #000;
+      border: 2px solid #00FF00;
+      margin: 0 auto;
+      padding: 10px;
+      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
+    }
+    #terminalOutput {
       white-space: pre-wrap;
-      min-height: 300px;
+      height: 400px;
+      overflow-y: hidden;
+      overflow-x: hidden;
     }
-    input[type=text] {
-      background-color: #000;
-      color: #33ff33;
-      border: none;
+    #terminalInput {
       width: 100%;
-      font-family: inherit;
-      font-size: inherit;
+      background-color: #000;
+      border: none;
+      color: #00FF00;
+      font-family: monospace;
+      font-size: 1em;
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <div id="terminal">
-    <div id="output">
-B.O.C. Node Access Terminal v1.03
-Status: ONLINE  |  Sector: 7-Active
-
-Type HELP for list of available commands
-    </div>
-    <div>
-      &gt; <input type="text" id="command" autofocus>
-    </div>
+  <div id="terminalContainer">
+    <div id="terminalOutput"></div>
+    <input type="text" id="terminalInput" autofocus onkeydown="handleCommand(event)" />
   </div>
+
   <script>
-    const output = document.getElementById('output');
-    const input = document.getElementById('command');
+    const terminalOutput = document.getElementById("terminalOutput");
+    const terminalInput = document.getElementById("terminalInput");
 
-    async function getDocsList() {
-      const res = await fetch('/docs/index.json');
-      return await res.json();
+    const bootSequence = [
+      "Boot sequence initiated...",
+      "Initializing node...",
+      "Station 7 Secure Connection Established.",
+      "Type HELP for list of commands.",
+      "> "
+    ];
+
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
+
+    let commandHistory = [];
+    let historyIndex = -1;
+
+    let bootIndex = 0;
+    function autoBoot() {
+      if (bootIndex < bootSequence.length) {
+        terminalOutput.innerText += bootSequence[bootIndex++] + "\n";
+        setTimeout(autoBoot, 400);
+      }
     }
 
-    function printLine(text = '') {
-      output.innerText += `\n${text}`;
-    }
+    autoBoot();
 
-    input.addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim().toUpperCase();
-        printLine(`> ${cmd}`);
-        input.value = '';
-
-        if (cmd === 'HELP') {
-          printLine('Available Commands:\n  DIR - List available documents\n  OPEN [filename] - View a document\n  CLEAR - Reset terminal');
-        } else if (cmd === 'DIR') {
-          const files = await getDocsList();
-          printLine('Directory Listing (/docs):');
-          files.forEach(file => {
-            printLine(`  ${file.name}`);
-          });
-        } else if (cmd.startsWith('OPEN ')) {
-          const filename = cmd.substring(5).trim();
-          const files = await getDocsList();
-          const match = files.find(f => f.name.toUpperCase() === filename);
-          if (match) {
-            window.open(match.path, '_blank');
-          } else {
-            printLine('ERROR: File not found');
-          }
-        } else if (cmd === 'CLEAR') {
-          output.innerText = 'B.O.C. Node Access Terminal v1.03\nStatus: ONLINE  |  Sector: 7-Active\n\nType HELP for list of available commands';
+    function handleCommand(e) {
+      if (e.key === "Enter") {
+        const input = terminalInput.value.trim();
+        terminalOutput.innerText += "> " + input + "\n";
+        terminalInput.value = "";
+        processCommand(input);
+        commandHistory.push(input);
+        historyIndex = commandHistory.length;
+      } else if (e.key === "ArrowUp") {
+        if (historyIndex > 0) {
+          historyIndex--;
+          terminalInput.value = commandHistory[historyIndex];
+        }
+      } else if (e.key === "ArrowDown") {
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          terminalInput.value = commandHistory[historyIndex];
         } else {
-          printLine('Unrecognized command. Type HELP.');
+          terminalInput.value = "";
         }
       }
-    });
+    }
+
+    function processCommand(cmd) {
+      const command = cmd.toUpperCase();
+      if (command === "HELP") {
+        terminalOutput.innerText += "Available Commands:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\nEXIT - Close terminal\n";
+      } else if (command === "DIR") {
+        terminalOutput.innerText += files.map(f => " - " + f).join("\n") + "\n";
+      } else if (command.startsWith("OPEN ")) {
+        const filename = cmd.slice(5).trim();
+        if (files.includes(filename)) {
+          terminalOutput.innerText += `Opening ${filename}...\n`;
+          window.open(`docs/${filename}`, '_blank');
+        } else {
+          terminalOutput.innerText += `File not found: ${filename}\n`;
+        }
+      } else if (command === "CLEAR") {
+        terminalOutput.innerText = "> ";
+      } else if (command === "EXIT") {
+        window.location.href = "/";
+      } else {
+        terminalOutput.innerText += `Unrecognized command: ${cmd}\n`;
+      }
+    }
   </script>
 </body>
 </html>
