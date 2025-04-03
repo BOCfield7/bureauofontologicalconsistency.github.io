@@ -1,113 +1,85 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOC Terminal</title>
+  <title>Terminal</title>
   <style>
-    body {
-      background-color: #000;
-      color: #00FF00;
-      font-family: monospace;
+    html, body {
       margin: 0;
-      padding: 20px;
-      animation: flicker 0.15s ease-in-out 3;
-    }
-
-    @keyframes flicker {
-      0% { opacity: 1; }
-      25% { opacity: 0.5; }
-      50% { opacity: 0.2; }
-      75% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
-    #terminal {
-      width: 640px;
-      margin: 0 auto;
-      border: 2px solid #00FF00;
-      padding: 20px;
-      background-color: #000;
-      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
-    }
-
-    #output {
-      white-space: pre-wrap;
-      height: 300px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      margin-bottom: 10px;
-    }
-
-    #input {
-      width: 100%;
+      padding: 0;
       background: #000;
-      border: none;
-      color: #00FF00;
+      color: #fff;
       font-family: monospace;
-      font-size: 1em;
-      outline: none;
+      font-size: 16px;
+      height: 100%;
+      overflow: hidden;
+    }
+    #terminal {
+      padding: 20px;
+      white-space: pre-wrap;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #fff;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
     }
   </style>
 </head>
 <body>
-  <div id="terminal">
-    <div id="output"></div>
-    <input type="text" id="input" autofocus onkeydown="processInput(event)" />
-  </div>
-
+  <div id="terminal">INITIALIZING STATION 7...</div>
+  <audio id="bleen-audio" src="bleen_dialup.wav" autoplay></audio>
   <script>
-    const output = document.getElementById('output');
-    const input = document.getElementById('input');
-
-    const files = [
-      "BOC-42-R_Artifact_Incident_Form.pdf",
-      "BOC-73-RC_Recursion_Event_Report.pdf",
-      "Field_Log_473QRTA.pdf",
-      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    const lines = [
+      "INITIALIZING STATION 7...",
+      "CONNECTED TO STRING X.XX.X",
+      "STATION 7 [VTERM] READY",
+      "> "
     ];
 
-    // Initial terminal load
-    output.innerHTML = 'Initializing Station 7...<br>Type HELP to begin.<br>';
+    const terminal = document.getElementById('terminal');
+    let index = 0;
 
-    function processInput(e) {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim();
-        if (cmd === '') return;
-        output.innerHTML += `> ${cmd}<br>`;
-        handleCommand(cmd);
-        input.value = '';
-        output.scrollTop = output.scrollHeight;
-      }
-    }
-
-    function handleCommand(cmd) {
-      const command = cmd.toUpperCase();
-
-      if (command === 'HELP') {
-        output.innerHTML += 'AVAILABLE COMMANDS:<br>DIR - List files<br>OPEN &lt;FILENAME&gt; - View file<br>CLEAR - Clear screen<br>';
-      } else if (command === 'DIR') {
-        output.innerHTML += files.map(f => '- ' + f).join('<br>') + '<br>';
-      } else if (command.startsWith('OPEN ')) {
-        const filename = cmd.slice(5).trim();
-        if (files.includes(filename)) {
-          output.innerHTML += `Opening ${filename}...<br>`;
-          window.open(`docs/${filename}`, '_blank');
-        } else {
-          output.innerHTML += `File not found: ${filename}<br>`;
-        }
-      } else if (command === 'CLEAR') {
-        output.innerHTML = '';
-      } else if (command === 'WHOAMI') {
-        output.innerHTML += 'Field Agent: Torres, D.<br>';
-      } else if (command === 'STATUS') {
-        output.innerHTML += 'Station 7 temporal sync: LOCKED<br>Bleen channel: ACTIVE<br>';
+    function typeNextLine() {
+      if (index < lines.length) {
+        const line = lines[index];
+        let charIndex = 0;
+        const typeChar = () => {
+          if (charIndex < line.length) {
+            terminal.innerHTML += line[charIndex++];
+            setTimeout(typeChar, 40);
+          } else {
+            terminal.innerHTML += "\n";
+            index++;
+            setTimeout(typeNextLine, 300);
+          }
+        };
+        typeChar();
       } else {
-        output.innerHTML += `Unknown command: ${cmd}<br>`;
+        terminal.innerHTML += '<span class="cursor">&nbsp;</span>';
       }
-
-      output.scrollTop = output.scrollHeight;
     }
+
+    function generateBleenConnectionString() {
+      const t = Date.now() / 1000;
+      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
+      const f = (t) => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
+      const raw = f(t).toFixed(6);
+      const segments = raw.match(/(\d)\.(\d{2})(\d)/);
+      return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
+    }
+
+    lines[1] = generateBleenConnectionString();
+
+    setTimeout(typeNextLine, 1000);
+
+    const audio = document.getElementById('bleen-audio');
+    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, (Math.random() * 4 + 5) * 1000);
   </script>
 </body>
 </html>
