@@ -1,126 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BOC Terminal Interface</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body {
-      background-color: #000;
-      color: #00FF00;
-      font-family: monospace;
-      margin: 0;
+    #terminal {
+      background-color: black;
+      color: green;
+      font-family: 'Courier New', monospace;
       padding: 20px;
+      width: 90%;
+      max-width: 800px;
+      margin: 40px auto;
+      border: 2px solid green;
+      border-radius: 4px;
     }
-    #terminalContainer {
-      width: 640px;
-      height: 480px;
-      background-color: #000;
-      border: 2px solid #00FF00;
-      margin: 0 auto;
-      padding: 10px;
-      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
-    }
-    #terminalOutput {
+    #output {
       white-space: pre-wrap;
-      height: 400px;
-      overflow-y: hidden;
-      overflow-x: hidden;
     }
-    #terminalInput {
-      width: 100%;
-      background-color: #000;
+    #input-line {
+      display: flex;
+    }
+    #input-line span {
+      margin-right: 10px;
+    }
+    #command-input {
+      flex: 1;
+      background: black;
+      color: green;
       border: none;
-      color: #00FF00;
-      font-family: monospace;
+      font-family: 'Courier New', monospace;
       font-size: 1em;
-      outline: none;
     }
   </style>
 </head>
 <body>
-  <div id="terminalContainer">
-    <div id="terminalOutput"></div>
-    <input type="text" id="terminalInput" autofocus onkeydown="handleCommand(event)" />
+  <div id="terminal">
+    <div id="output">
+Welcome to B.O.C. Node Interface
+Type 'HELP' for commands.
+
+> DIR
+/docs/BOC-42-R_Artifact_Incident_Form.pdf
+/docs/BOC-73-RC_Recursion_Event_Report.pdf
+/docs/Field_Log_473QRTA.pdf
+/docs/NTIA_Field_Memo_BVHA_Recursion.pdf
+
+> 
+    </div>
+    <div id="input-line">
+      <span>&gt;</span>
+      <input id="command-input" type="text" autocomplete="off" autofocus />
+    </div>
   </div>
-
   <script>
-    const terminalOutput = document.getElementById("terminalOutput");
-    const terminalInput = document.getElementById("terminalInput");
+    const input = document.getElementById("command-input");
+    const output = document.getElementById("output");
 
-    const bootSequence = [
-      "Boot sequence initiated...",
-      "Initializing node...",
-      "Station 7 Secure Connection Established.",
-      "Type HELP for list of commands.",
-      "> "
-    ];
+    const commands = {
+      help: `Available commands:\nHELP - Show this message\nDIR - List accessible files\nOPEN [filename] - Open a file (PDFs only)` ,
+      dir: `/docs/BOC-42-R_Artifact_Incident_Form.pdf\n/docs/BOC-73-RC_Recursion_Event_Report.pdf\n/docs/Field_Log_473QRTA.pdf\n/docs/NTIA_Field_Memo_BVHA_Recursion.pdf`,
+    };
 
-    const files = [
-      "BOC-42-R_Artifact_Incident_Form.pdf",
-      "BOC-73-RC_Recursion_Event_Report.pdf",
-      "Field_Log_473QRTA.pdf",
-      "NTIA_Field_Memo_BVHA_Recursion.pdf"
-    ];
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        const cmd = input.value.trim();
+        output.innerText += `> ${cmd}\n`;
 
-    let commandHistory = [];
-    let historyIndex = -1;
-
-    let bootIndex = 0;
-    function autoBoot() {
-      if (bootIndex < bootSequence.length) {
-        terminalOutput.innerText += bootSequence[bootIndex++] + "\n";
-        setTimeout(autoBoot, 400);
-      }
-    }
-
-    autoBoot();
-
-    function handleCommand(e) {
-      if (e.key === "Enter") {
-        const input = terminalInput.value.trim();
-        terminalOutput.innerText += "> " + input + "\n";
-        terminalInput.value = "";
-        processCommand(input);
-        commandHistory.push(input);
-        historyIndex = commandHistory.length;
-      } else if (e.key === "ArrowUp") {
-        if (historyIndex > 0) {
-          historyIndex--;
-          terminalInput.value = commandHistory[historyIndex];
-        }
-      } else if (e.key === "ArrowDown") {
-        if (historyIndex < commandHistory.length - 1) {
-          historyIndex++;
-          terminalInput.value = commandHistory[historyIndex];
+        if (cmd.toLowerCase() === "help") {
+          output.innerText += commands.help + "\n";
+        } else if (cmd.toLowerCase() === "dir") {
+          output.innerText += commands.dir + "\n";
+        } else if (cmd.toLowerCase().startsWith("open ")) {
+          const path = cmd.slice(5).trim();
+          window.open(path, '_blank');
         } else {
-          terminalInput.value = "";
+          output.innerText += `Unrecognized command: ${cmd}\n`;
         }
-      }
-    }
 
-    function processCommand(cmd) {
-      const command = cmd.toUpperCase();
-      if (command === "HELP") {
-        terminalOutput.innerText += "Available Commands:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\nEXIT - Close terminal\n";
-      } else if (command === "DIR") {
-        terminalOutput.innerText += files.map(f => " - " + f).join("\n") + "\n";
-      } else if (command.startsWith("OPEN ")) {
-        const filename = cmd.slice(5).trim();
-        if (files.includes(filename)) {
-          terminalOutput.innerText += `Opening ${filename}...\n`;
-          window.open(`docs/${filename}`, '_blank');
-        } else {
-          terminalOutput.innerText += `File not found: ${filename}\n`;
-        }
-      } else if (command === "CLEAR") {
-        terminalOutput.innerText = "> ";
-      } else if (command === "EXIT") {
-        window.location.href = "/";
-      } else {
-        terminalOutput.innerText += `Unrecognized command: ${cmd}\n`;
+        input.value = "";
+        output.scrollTop = output.scrollHeight;
       }
-    }
+    });
   </script>
 </body>
 </html>
