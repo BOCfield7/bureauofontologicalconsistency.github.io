@@ -1,78 +1,96 @@
-/* BOC style.css – CRT-Gov Hybrid */
-
+/* Core Modern Aesthetic */
 body {
   margin: 0;
-  padding: 0;
-  background-color: #f4f4f0;
-  font-family: "Courier New", Courier, monospace;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f7f7;
   color: #1a1a1a;
-  line-height: 1.6;
-  font-size: 15px;
 }
 
 header {
-  background-color: #dcdcdc;
-  padding: 1em 0;
-  text-align: center;
-  border-bottom: 2px solid #999;
+  background-color: #222;
+  color: white;
+  padding: 1em 2em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 header h1 {
   margin: 0;
-  font-size: 1.8em;
-  letter-spacing: 1px;
+  font-size: 1.5em;
 }
 
-.subheader {
-  font-size: 0.95em;
-  color: #333;
-  margin-top: 0.2em;
+nav a {
+  color: white;
+  margin-left: 2em;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
 }
 
 main {
-  padding: 1.5em;
+  padding: 3em 2em;
   max-width: 800px;
   margin: auto;
 }
 
-.status-block, .notice-block {
-  background-color: #fff;
-  border: 1px solid #ccc;
+button.terminal-launch {
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 0.75em 1.5em;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 2em;
+  transition: background-color 0.3s ease;
+}
+
+button.terminal-launch:hover {
+  background-color: #666;
+}
+
+/* Legacy Terminal Overlay */
+#terminal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 1em;
-  margin-bottom: 1.5em;
-  box-shadow: 0 0 5px rgba(0,0,0,0.05);
 }
 
-.nav-panel ul {
-  list-style: none;
-  padding: 0;
-  margin: 1em 0;
+#terminal-frame {
+  width: 90%;
+  max-width: 640px;
+  height: 480px;
+  background: black;
+  border: 3px double #00ff00;
+  overflow: auto;
+  padding: 1em;
+  font-size: 0.9em;
+  box-shadow: 0 0 20px #00ff00;
+  white-space: pre-wrap;
+  overflow-y: scroll;
 }
 
-.nav-panel li {
-  margin: 0.7em 0;
-}
-
-.nav-panel a {
-  color: #003366;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 0.2em 0;
-  display: inline-block;
-  border-bottom: 1px dashed #003366;
-}
-
-.nav-panel a:hover {
-  color: #005599;
-  border-bottom: 1px solid #005599;
-}
-
-footer {
-  text-align: center;
-  font-size: 0.85em;
-  color: #555;
-  margin-top: 3em;
-  padding: 1em 0;
-  border-top: 1px solid #ccc;
-  background-color: #efefef;
+#exit-terminal {
+  background-color: black;
+  border: 1px solid #00ff00;
+  color: #00ff00;
+  font-family: monospace;
+  padding: 0.5em 1em;
+  margin-top: 1em;
+  cursor: pointer;
 }
