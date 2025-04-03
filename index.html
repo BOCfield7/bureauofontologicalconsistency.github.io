@@ -2,76 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bureau of Ontological Consistency</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      background: url('station7_background.png') no-repeat center center fixed;
-      background-size: cover;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #f4f4f4;
-    }
-    header {
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      text-align: center;
-      border-bottom: 1px solid #333;
-    }
-    h1 {
-      margin: 0;
-      font-size: 2em;
-    }
-    nav {
-      display: flex;
-      justify-content: center;
-      background-color: rgba(0, 0, 0, 0.5);
-      padding: 10px;
-    }
-    nav a {
-      color: #f4f4f4;
-      text-decoration: none;
-      margin: 0 15px;
-      font-size: 1em;
-    }
-    nav a:hover {
-      text-decoration: underline;
-    }
-    .content {
-      padding: 40px;
-      text-align: center;
-      min-height: 70vh;
-    }
-    .terminal-icon {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 32px;
-      height: 32px;
-      background: url('terminal_icon.png') no-repeat center center;
-      background-size: contain;
-      cursor: pointer;
-      opacity: 0.7;
-    }
-    .terminal-icon:hover {
-      opacity: 1;
-    }
-  </style>
 </head>
 <body>
   <header>
-    <h1>Bureau of Ontological Consistency</h1>
+    <h1>🜁 Bureau of Ontological Consistency</h1>
+    <nav>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="terminal.html">🖳 Terminal</a></li>
+      </ul>
+    </nav>
   </header>
-  <nav>
-    <a href="#">About</a>
-    <a href="#">Contact</a>
-  </nav>
-  <div class="content">
-    <p>Status: ONLINE — Station 7 Active</p>
-    <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
-  </div>
-  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
+
+  <main>
+    <section class="hero">
+      <h2>Multiversal Node Access Interface</h2>
+      <p>Status: <span class="status">ONLINE</span> — Station 7 Active</p>
+    </section>
+
+    <section id="about">
+      <h3>About the B.O.C.</h3>
+      <p>The Bureau of Ontological Consistency exists to monitor, stabilize, and audit cross-thread phenomena, recursive signal propagation, and existential drift across local and multiversal strings.</p>
+    </section>
+
+    <section id="contact">
+      <h3>Contact Oversight</h3>
+      <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
+    </section>
+
+    <section>
+      <h3>Legacy Access</h3>
+      <iframe src="terminal.html" width="100%" height="400px" style="border: 1px solid #888; background:#0f0; color:#000;"></iframe>
+    </section>
+  </main>
+
+  <footer>
+    <p><small>&copy; 1998–2025 Bureau of Ontological Consistency</small></p>
+  </footer>
 </body>
 </html>
