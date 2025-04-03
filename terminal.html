@@ -19,6 +19,8 @@
     #terminal {
       padding: 20px;
       white-space: pre-wrap;
+      height: 90%;
+      overflow-y: auto;
     }
     .cursor {
       display: inline-block;
@@ -29,41 +31,39 @@
     @keyframes blink {
       50% { background: transparent; }
     }
+    #input-line {
+      display: flex;
+      align-items: center;
+    }
+    #input {
+      background: #000;
+      border: none;
+      color: #fff;
+      font-family: monospace;
+      font-size: 16px;
+      outline: none;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...</div>
+  <div id="terminal">INITIALIZING STATION 7...
+</div>
+  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
   <audio id="bleen-audio" src="bleen_dialup.wav" autoplay></audio>
+
   <script>
-    const lines = [
-      "INITIALIZING STATION 7...",
-      "CONNECTED TO STRING X.XX.X",
-      "STATION 7 [VTERM] READY",
-      "> "
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('input');
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
 
-    const terminal = document.getElementById('terminal');
-    let index = 0;
-
-    function typeNextLine() {
-      if (index < lines.length) {
-        const line = lines[index];
-        let charIndex = 0;
-        const typeChar = () => {
-          if (charIndex < line.length) {
-            terminal.innerHTML += line[charIndex++];
-            setTimeout(typeChar, 40);
-          } else {
-            terminal.innerHTML += "\n";
-            index++;
-            setTimeout(typeNextLine, 300);
-          }
-        };
-        typeChar();
-      } else {
-        terminal.innerHTML += '<span class="cursor">&nbsp;</span>';
-      }
-    }
+    const audio = document.getElementById('bleen-audio');
+    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, (Math.random() * 4 + 5) * 1000);
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
@@ -74,12 +74,64 @@
       return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
     }
 
-    lines[1] = generateBleenConnectionString();
+    const bootLines = [
+      "INITIALIZING STATION 7...",
+      generateBleenConnectionString(),
+      "STATION 7 [VTERM] READY"
+    ];
 
-    setTimeout(typeNextLine, 1000);
+    let bootIndex = 0;
 
-    const audio = document.getElementById('bleen-audio');
-    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, (Math.random() * 4 + 5) * 1000);
+    function typeBootLine() {
+      if (bootIndex < bootLines.length) {
+        const line = bootLines[bootIndex];
+        let charIndex = 0;
+        const typeChar = () => {
+          if (charIndex < line.length) {
+            terminal.innerText += line[charIndex++];
+            setTimeout(typeChar, 40);
+          } else {
+            terminal.innerText += "\n";
+            bootIndex++;
+            setTimeout(typeBootLine, 300);
+          }
+        };
+        typeChar();
+      }
+    }
+
+    typeBootLine();
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        const command = input.value.trim();
+        terminal.innerText += `> ${command}\n`;
+        handleCommand(command);
+        input.value = "";
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    });
+
+    function handleCommand(cmd) {
+      const c = cmd.toUpperCase();
+      if (c === "HELP") {
+        terminal.innerText += "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <filename> - Open file\nCLEAR - Clear screen\n";
+      } else if (c === "DIR") {
+        terminal.innerText += files.map(f => `- ${f}`).join("\n") + "\n";
+      } else if (c.startsWith("OPEN ")) {
+        const filename = cmd.slice(5).trim();
+        if (files.includes(filename)) {
+          terminal.innerText += `Opening ${filename}...\n`;
+          window.open(`docs/${filename}`, '_blank');
+        } else {
+          terminal.innerText += `File not found: ${filename}\n`;
+        }
+      } else if (c === "CLEAR") {
+        terminal.innerText = "";
+      } else {
+        terminal.innerText += `Unknown command: ${cmd}\n`;
+      }
+    }
   </script>
 </body>
 </html>
