@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BOC Terminal Interface</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #terminal {
+      background-color: #000;
+      color: #33ff33;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 2em;
+      width: 80%;
+      max-width: 800px;
+      margin: auto;
+      margin-top: 3em;
+      border-radius: 5px;
+    }
+    #output {
+      white-space: pre-wrap;
+      min-height: 300px;
+    }
+    input[type=text] {
+      background-color: #000;
+      color: #33ff33;
+      border: none;
+      width: 100%;
+      font-family: inherit;
+      font-size: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal">
+    <div id="output">
+B.O.C. Node Access Terminal v1.03
+Status: ONLINE  |  Sector: 7-Active
+
+Type HELP for list of available commands
+    </div>
+    <div>
+      &gt; <input type="text" id="command" autofocus>
+    </div>
+  </div>
+  <script>
+    const output = document.getElementById('output');
+    const input = document.getElementById('command');
+
+    async function getDocsList() {
+      const res = await fetch('/docs/index.json');
+      return await res.json();
+    }
+
+    function printLine(text = '') {
+      output.innerText += `\n${text}`;
+    }
+
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim().toUpperCase();
+        printLine(`> ${cmd}`);
+        input.value = '';
+
+        if (cmd === 'HELP') {
+          printLine('Available Commands:\n  DIR - List available documents\n  OPEN [filename] - View a document\n  CLEAR - Reset terminal');
+        } else if (cmd === 'DIR') {
+          const files = await getDocsList();
+          printLine('Directory Listing (/docs):');
+          files.forEach(file => {
+            printLine(`  ${file.name}`);
+          });
+        } else if (cmd.startsWith('OPEN ')) {
+          const filename = cmd.substring(5).trim();
+          const files = await getDocsList();
+          const match = files.find(f => f.name.toUpperCase() === filename);
+          if (match) {
+            window.open(match.path, '_blank');
+          } else {
+            printLine('ERROR: File not found');
+          }
+        } else if (cmd === 'CLEAR') {
+          output.innerText = 'B.O.C. Node Access Terminal v1.03\nStatus: ONLINE  |  Sector: 7-Active\n\nType HELP for list of available commands';
+        } else {
+          printLine('Unrecognized command. Type HELP.');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
