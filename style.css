@@ -67,70 +67,40 @@ main {
   opacity: 1;
 }
 
-/* Modal styles */
-.hidden {
-  display: none;
-}
-
-.modal {
+/* ✅ Contact Box Styles */
+.contact-box {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1001;
-}
-
-.modal-content {
-  position: relative;
-  background: rgba(20, 20, 20, 0.95);
-  padding: 30px;
+  bottom: 100px;
+  right: 50px;
+  background: rgba(0, 0, 0, 0.9);
   border: 1px solid #00ffe1;
+  padding: 20px;
+  z-index: 1001;
   color: #e0e0e0;
-  width: 80%;
-  max-width: 600px;
+  font-family: monospace;
   border-radius: 6px;
-  box-shadow: 0 0 20px rgba(0, 255, 225, 0.3);
-  font-family: 'Courier New', Courier, monospace;
+  box-shadow: 0 0 12px rgba(0, 255, 225, 0.3);
+  max-width: 300px;
 }
 
-.modal-content h2 {
+.contact-content {
+  position: relative;
+}
+
+.contact-box .close {
+  position: absolute;
+  top: 0;
+  right: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #aaa;
+}
+
+.contact-box .close:hover {
   color: #00ffe1;
-  margin-top: 0;
 }
 
-.modal-content a {
+.contact-box a {
   color: #00ffe1;
   text-decoration: underline;
-}
-
-.modal-content a:hover {
-  text-decoration: none;
-}
-
-.close {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  color: #aaa;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.close:hover {
-  color: #00ffe1;
-}
-
-/* Optional: CRT flicker effect */
-body {
-  animation: flicker 0.15s ease-in-out 3;
-}
-
-@keyframes flicker {
-  0% { opacity: 1; }
-  25% { opacity: 0.5; }
-  50% { opacity: 0.2; }
-  75% { opacity: 0.6; }
-  100% { opacity: 1; }
 }
