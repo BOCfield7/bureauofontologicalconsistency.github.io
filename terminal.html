@@ -1,89 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOC Terminal Interface</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
-    #terminal {
-      background-color: black;
-      color: green;
-      font-family: 'Courier New', monospace;
-      padding: 20px;
-      width: 90%;
-      max-width: 800px;
-      margin: 40px auto;
-      border: 2px solid green;
-      border-radius: 4px;
-    }
-    #output {
-      white-space: pre-wrap;
-    }
-    #input-line {
-      display: flex;
-    }
-    #input-line span {
-      margin-right: 10px;
-    }
-    #command-input {
-      flex: 1;
-      background: black;
-      color: green;
-      border: none;
-      font-family: 'Courier New', monospace;
-      font-size: 1em;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bureau of Ontological Consistency</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="terminal">
-    <div id="output">
-Welcome to B.O.C. Node Interface
-Type 'HELP' for commands.
-
-> DIR
-/docs/BOC-42-R_Artifact_Incident_Form.pdf
-/docs/BOC-73-RC_Recursion_Event_Report.pdf
-/docs/Field_Log_473QRTA.pdf
-/docs/NTIA_Field_Memo_BVHA_Recursion.pdf
-
-> 
-    </div>
-    <div id="input-line">
-      <span>&gt;</span>
-      <input id="command-input" type="text" autocomplete="off" autofocus />
-    </div>
-  </div>
-  <script>
-    const input = document.getElementById("command-input");
-    const output = document.getElementById("output");
-
-    const commands = {
-      help: `Available commands:\nHELP - Show this message\nDIR - List accessible files\nOPEN [filename] - Open a file (PDFs only)` ,
-      dir: `/docs/BOC-42-R_Artifact_Incident_Form.pdf\n/docs/BOC-73-RC_Recursion_Event_Report.pdf\n/docs/Field_Log_473QRTA.pdf\n/docs/NTIA_Field_Memo_BVHA_Recursion.pdf`,
-    };
-
-    input.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        const cmd = input.value.trim();
-        output.innerText += `> ${cmd}\n`;
-
-        if (cmd.toLowerCase() === "help") {
-          output.innerText += commands.help + "\n";
-        } else if (cmd.toLowerCase() === "dir") {
-          output.innerText += commands.dir + "\n";
-        } else if (cmd.toLowerCase().startsWith("open ")) {
-          const path = cmd.slice(5).trim();
-          window.open(path, '_blank');
-        } else {
-          output.innerText += `Unrecognized command: ${cmd}\n`;
-        }
-
-        input.value = "";
-        output.scrollTop = output.scrollHeight;
-      }
-    });
-  </script>
+  <header>
+    <h1>Bureau of Ontological Consistency</h1>
+    <nav>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <p>Status: ONLINE — Station 7 Active</p>
+      <p>Field communications may be routed through <a href="mailto:oversight@bureauofontologicalconsistency.org">oversight@bureauofontologicalconsistency.org</a>.</p>
+    </section>
+  </main>
+  <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
 </body>
 </html>
