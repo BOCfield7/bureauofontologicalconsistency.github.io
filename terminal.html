@@ -63,7 +63,7 @@
     ];
 
     const audio = document.getElementById('bleen-audio');
-    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, (Math.random() * 4 + 5) * 1000);
+    setTimeout(() => { audio.pause(); audio.currentTime = 0; }, (Math.random() * 10 + 10) * 1000);
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
