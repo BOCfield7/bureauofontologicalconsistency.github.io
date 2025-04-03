@@ -11,8 +11,7 @@
     <h1>Bureau of Ontological Consistency</h1>
     <nav>
       <a href="#" onclick="toggleContactBox(event)">Contact</a>
-      <a href="#" onclick="toggleAboutBox(event)">About</a>
-      <a href="#" onclick="launchTerminalWindow(event)">Terminal Prompt</a>
+      <a href="#">About</a>
     </nav>
   </header>
 
@@ -25,7 +24,7 @@
 
   <a href="terminal.html" class="terminal-icon" title="Legacy Terminal Access"></a>
 
-  <!-- Contact Box -->
+  <!-- ✅ Simple Contact Box -->
   <div id="contact-box" style="display: none;" class="contact-box">
     <div class="contact-content">
       <span class="close" onclick="toggleContactBox(event)">&times;</span>
@@ -33,131 +32,12 @@
     </div>
   </div>
 
-  <!-- About Box -->
-  <div id="about-box" style="display: none;" class="about-box">
-    <div class="about-content">
-      <span class="close" onclick="toggleAboutBox(event)">&times;</span>
-      <p><strong>Purpose & Scope:</strong></p>
-      <p>The Bureau of Ontological Consistency (B.O.C.) exists to monitor, record, and stabilize recursive artifacts and temporal thread anomalies across authorized threads.</p>
-      <p>All actions are in accordance with internal directive 7-Lambda, under the authority of the Station Oversight Protocol. No external review required.</p>
-      <p>⚠ Inquiries regarding event origin, system entropy, or field destabilization will not receive acknowledgment.</p>
-    </div>
-  </div>
-
-  <!-- Scripts -->
+  <!-- ✅ Contact Box Toggle Script -->
   <script>
     function toggleContactBox(event) {
       event.preventDefault();
       const box = document.getElementById('contact-box');
       box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function toggleAboutBox(event) {
-      event.preventDefault();
-      const box = document.getElementById('about-box');
-      box.style.display = box.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function launchTerminalWindow(event) {
-      event.preventDefault();
-
-      const bleenString = generateBleenConnectionString();
-      const audioDuration = getRandomAudioDuration(); // 5–9 seconds
-      const audioSrc = "bleen_dialup.wav"; // Place this file in the same directory
-
-      const terminalHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>Terminal</title>
-          <style>
-            html, body {
-              margin: 0;
-              padding: 0;
-              background: #000;
-              color: #fff;
-              font-family: monospace;
-              font-size: 16px;
-              height: 100%;
-              overflow: hidden;
-            }
-            #terminal {
-              padding: 20px;
-              white-space: pre-wrap;
-            }
-            .cursor {
-              display: inline-block;
-              width: 10px;
-              background: #fff;
-              animation: blink 1s step-end infinite;
-            }
-            @keyframes blink {
-              50% { background: transparent; }
-            }
-          </style>
-        </head>
-        <body>
-          <div id="terminal">INITIALIZING STATION 7...</div>
-          <audio id="bleen-audio" src="${audioSrc}" autoplay></audio>
-          <script>
-            const lines = [
-              "INITIALIZING STATION 7...",
-              "${bleenString}",
-              "STATION 7 [VTERM] READY",
-              "> "
-            ];
-            const terminal = document.getElementById('terminal');
-            let index = 0;
-
-            function typeNextLine() {
-              if (index < lines.length) {
-                const line = lines[index];
-                let charIndex = 0;
-                const typeChar = () => {
-                  if (charIndex < line.length) {
-                    terminal.innerHTML += line[charIndex++];
-                    setTimeout(typeChar, 40);
-                  } else {
-                    terminal.innerHTML += "\\n";
-                    index++;
-                    setTimeout(typeNextLine, 300);
-                  }
-                };
-                typeChar();
-              } else {
-                terminal.innerHTML += '<span class="cursor">&nbsp;</span>';
-              }
-            }
-
-            setTimeout(typeNextLine, 1000);
-
-            const audio = document.getElementById('bleen-audio');
-            setTimeout(() => { audio.pause(); audio.currentTime = 0; }, ${audioDuration * 1000});
-          <\/script>
-        </body>
-        </html>
-      `;
-
-      const w = 720;
-      const h = 480;
-      const left = (screen.width - w) / 2;
-      const top = (screen.height - h) / 2;
-      const win = window.open('', '', \`width=\${w},height=\${h},left=\${left},top=\${top}\`);
-      win.document.write(terminalHTML);
-      win.document.close();
-    }
-
-    function generateBleenConnectionString() {
-      const t = Date.now() / 1000;
-      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
-      const f = (t) => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
-      const raw = f(t).toFixed(6);
-      const segments = raw.match(/(\d)\.(\d{2})(\d)/);
-      return \`CONNECTED TO STRING \${segments[1]}.\${segments[2]}.\${segments[3]}\`;
-    }
-
-    function getRandomAudioDuration() {
-      return Math.random() * 4 + 5; // Returns a float between 5 and 9
     }
   </script>
 </body>
