@@ -70,6 +70,13 @@
       return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
     }
 
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
+
     const bootLines = [
       "INITIALIZING STATION 7...",
       generateBleenConnectionString(),
@@ -118,7 +125,7 @@
 
       switch (base) {
         case "HELP":
-          delay("STANDARD COMMANDS:\nWHOAMI\nUPTIME\nPING <host>\nTRACEROUTE <host>\nCD <dir>\nLS <dir>\nFORMAT <disk>\nSSH <user@host>\nCLEAR");
+          delay("STANDARD COMMANDS:\nWHOAMI\nUPTIME\nDIR\nOPEN <filename>\nPING <host>\nTRACEROUTE <host>\nCD <dir>\nLS <dir>\nFORMAT <disk>\nSSH <user@host>\nCLEAR");
           break;
         case "CLEAR":
           terminal.innerText = "";
@@ -157,6 +164,20 @@
           break;
         case "SSH":
           delay("Connection refused (port 22)");
+          break;
+        case "DIR":
+          terminal.innerText += "Directory of /docs\n\n";
+          files.forEach((file, i) => {
+            setTimeout(() => terminal.innerText += `- ${file}\n`, i * 100);
+          });
+          break;
+        case "OPEN":
+          if (files.includes(params)) {
+            terminal.innerText += `Opening ${params}...\n`;
+            window.open(`docs/${params}`, '_blank');
+          } else {
+            terminal.innerText += `File not found: ${params}\n`;
+          }
           break;
         default:
           delay("Error: Command not recognized or malformed syntax");
