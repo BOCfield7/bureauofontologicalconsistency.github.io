@@ -123,10 +123,10 @@
           "OPEN <FILENAME> - View file\n" +
           "CLEAR - Clear screen\n" +
           "CD <DIR> - Change directory (disabled)\n" +
-          "PING <TARGET> - Simulated ping\n" +
-          "TRACERT <TARGET> - Simulated traceroute\n" +
+          "PING <TARGET> - ping\n" +
+          "TRACERT <TARGET> - traceroute\n" +
           "WHOAMI - Display user ID\n" +
-          "EXIT - Freeze terminal\n";
+          "EXIT - Stop terminal\n";
       } else if (command === "DIR") {
         terminal.innerText += "Directory of /docs\n\n";
         files.forEach(f => terminal.innerText += `- ${f}\n`);
