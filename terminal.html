@@ -117,7 +117,16 @@
     function handleCommand(cmd) {
       const command = cmd.toUpperCase();
       if (command === "HELP") {
-        terminal.innerText += "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View file\nCLEAR - Clear screen\n";
+        terminal.innerText += 
+          "AVAILABLE COMMANDS:\n" +
+          "DIR - List files\n" +
+          "OPEN <FILENAME> - View file\n" +
+          "CLEAR - Clear screen\n" +
+          "CD <DIR> - Change directory (disabled)\n" +
+          "PING <TARGET> - Simulated ping\n" +
+          "TRACERT <TARGET> - Simulated traceroute\n" +
+          "WHOAMI - Display user ID\n" +
+          "EXIT - Freeze terminal\n";
       } else if (command === "DIR") {
         terminal.innerText += "Directory of /docs\n\n";
         files.forEach(f => terminal.innerText += `- ${f}\n`);
@@ -129,8 +138,28 @@
         } else {
           terminal.innerText += `File not found: ${filename}\n`;
         }
+      } else if (command.startsWith("CD ")) {
+        terminal.innerText += "Access denied: directory permissions restricted.\n";
+      } else if (command.startsWith("PING ")) {
+        const target = cmd.slice(5).trim();
+        for (let i = 0; i < 4; i++) {
+          const delay = Math.floor(Math.random() * 200) + 30;
+          terminal.innerText += `Reply from ${target}: time=${delay}ms\n`;
+        }
+      } else if (command.startsWith("TRACERT ")) {
+        const target = cmd.slice(8).trim();
+        for (let i = 1; i <= 6; i++) {
+          const delay = Math.floor(Math.random() * 100) + 50;
+          terminal.innerText += `${i}    10.${i}.0.${i}    ${delay}ms\n`;
+        }
+        terminal.innerText += `Trace complete to ${target}\n`;
+      } else if (command === "WHOAMI") {
+        terminal.innerText += "field.agent.073\n";
       } else if (command === "CLEAR") {
         terminal.innerText = "";
+      } else if (command === "EXIT") {
+        terminal.innerText += "Terminating session...\n";
+        inputLine.style.display = "none";
       } else {
         terminal.innerText += `Unknown command: ${cmd}\n`;
       }
