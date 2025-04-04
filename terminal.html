@@ -155,6 +155,9 @@
         terminal.innerText += `Trace complete to ${target}\n`;
       } else if (command === "WHOAMI") {
         terminal.innerText += "field.agent.073\n";
+         } else if (command === "THREAD ?") {
+        terminal.innerText += "03.428.b  CAUTION: WOBBLE DETECTED!!";
+      }
       } else if (command === "CLEAR") {
         terminal.innerText = "";
       } else if (command === "EXIT") {
