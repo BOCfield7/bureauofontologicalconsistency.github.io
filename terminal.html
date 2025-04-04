@@ -34,6 +34,7 @@
     #input-line {
       display: flex;
       align-items: center;
+      display: none;
     }
     #input {
       background: #000;
@@ -47,19 +48,23 @@
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...\n</div>
+  <div id="terminal">INITIALIZING STATION 7...
+</div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
   <audio id="bleen-audio" src="bleen_dialup.wav" autoplay></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
+    const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-
     const audio = document.getElementById('bleen-audio');
-    setTimeout(() => {
-      audio.pause();
-      audio.currentTime = 0;
-    }, 10300);
+
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
@@ -70,15 +75,7 @@
       return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
     }
 
-    const files = [
-      "BOC-42-R_Artifact_Incident_Form.pdf",
-      "BOC-73-RC_Recursion_Event_Report.pdf",
-      "Field_Log_473QRTA.pdf",
-      "NTIA_Field_Memo_BVHA_Recursion.pdf"
-    ];
-
     const bootLines = [
-      "INITIALIZING STATION 7...",
       generateBleenConnectionString(),
       "STATION 7 [VTERM] READY"
     ];
@@ -100,10 +97,12 @@
           }
         };
         typeChar();
+      } else {
+        terminal.innerText += "> ";
+        inputLine.style.display = "flex";
+        input.focus();
       }
     }
-
-    typeBootLine();
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -116,74 +115,30 @@
     });
 
     function handleCommand(cmd) {
-      const args = cmd.trim().split(" ");
-      const base = args[0].toUpperCase();
-      const params = args.slice(1).join(" ");
-      const delay = (text) => setTimeout(() => {
-        terminal.innerText += text + "\n";
-      }, Math.random() * 200 + 100);
-
-      switch (base) {
-        case "HELP":
-          delay("STANDARD COMMANDS:\nWHOAMI\nUPTIME\nDIR\nOPEN <filename>\nPING <host>\nTRACEROUTE <host>\nCD <dir>\nLS <dir>\nFORMAT <disk>\nSSH <user@host>\nCLEAR");
-          break;
-        case "CLEAR":
-          terminal.innerText = "";
-          break;
-        case "WHOAMI":
-          delay("agent_b.oc");
-          break;
-        case "UPTIME":
-          delay("System up for 394 hours 17 minutes");
-          break;
-        case "PING":
-          if (!params) delay("Error: PING requires a target (IP or hostname)");
-          else if (params === "127.0.0.1") delay("Reply from 127.0.0.1: bytes=32 time<1ms TTL=64");
-          else delay(`Request timed out for ${params}`);
-          break;
-        case "TRACEROUTE":
-          if (!params) delay("Error: TRACEROUTE requires a hostname");
-          else {
-            const lines = [
-              `Tracing route to ${params}...`,
-              "1   192.168.0.1     2ms",
-              "2   10.42.73.1      [corrupt hop]",
-              "3   * * *           Request timed out."
-            ];
-            lines.forEach((l, i) => setTimeout(() => terminal.innerText += l + "\n", i * 250));
-          }
-          break;
-        case "CD":
-          delay("Segmentation fault (core dumped)");
-          break;
-        case "LS":
-          delay("Error: Access to directory denied or does not exist");
-          break;
-        case "FORMAT":
-          delay("Operation denied: protected volume");
-          break;
-        case "SSH":
-          delay("Connection refused (port 22)");
-          break;
-        case "DIR":
-          terminal.innerText += "Directory of /docs\n\n";
-          files.forEach((file, i) => {
-            setTimeout(() => terminal.innerText += `- ${file}\n`, i * 100);
-          });
-          break;
-        case "OPEN":
-          if (files.includes(params)) {
-            terminal.innerText += `Opening ${params}...\n`;
-            window.open(`docs/${params}`, '_blank');
-          } else {
-            terminal.innerText += `File not found: ${params}\n`;
-          }
-          break;
-        default:
-          delay("Error: Command not recognized or malformed syntax");
-          break;
+      const command = cmd.toUpperCase();
+      if (command === "HELP") {
+        terminal.innerText += "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View file\nCLEAR - Clear screen\n";
+      } else if (command === "DIR") {
+        terminal.innerText += "Directory of /docs\n\n";
+        files.forEach(f => terminal.innerText += `- ${f}\n`);
+      } else if (command.startsWith("OPEN ")) {
+        const filename = cmd.slice(5).trim();
+        if (files.includes(filename)) {
+          terminal.innerText += `Opening ${filename}...\n`;
+          window.open(`docs/${filename}`, '_blank');
+        } else {
+          terminal.innerText += `File not found: ${filename}\n`;
+        }
+      } else if (command === "CLEAR") {
+        terminal.innerText = "";
+      } else {
+        terminal.innerText += `Unknown command: ${cmd}\n`;
       }
     }
+
+    audio.onended = () => {
+      setTimeout(typeBootLine, 1000);
+    };
   </script>
 </body>
 </html>
