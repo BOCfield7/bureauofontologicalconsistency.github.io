@@ -50,7 +50,7 @@
   <div id="terminal">INITIALIZING STATION 7...
 </div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
-  <audio id="bleen-audio" src="bleen_dialup.wav" autoplay></audio>
+  <audio id="bleen-audio" src="bleen_with_quantum_input.wav" autoplay></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
@@ -65,7 +65,8 @@
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
 
-    const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"]; // protection
+    const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"];
+    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
@@ -140,21 +141,21 @@
         terminal.innerText = "";
       } else if (upper === "CONNECT QRT") {
         terminal.innerText += "Initiating remote handshake to QRT...\n";
-        const bleen = new Audio("bleen_dialup.wav");
+        const bleen = new Audio("bleen_with_quantum_input.wav");
         bleen.play();
-        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app/api/handshake")
+        fetch(`${endpoint}/api/handshake`)
           .then(res => res.text())
           .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
-          .catch(err => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
+          .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
       } else if (upper.startsWith("AT")) {
         if (forbiddenCommands.some(f => upper.startsWith(f))) {
           terminal.innerText += `\nPermission denied. Command restricted.\n> `;
           return;
         }
-        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app/api/modem?cmd=" + encodeURIComponent(cmd))
+        fetch(`${endpoint}/api/modem?cmd=` + encodeURIComponent(cmd))
           .then(res => res.text())
           .then(txt => terminal.innerText += `${txt}\n> `)
-          .catch(err => terminal.innerText += `Modem error or offline.\n> `);
+          .catch(() => terminal.innerText += `Modem error or offline.\n> `);
       } else {
         terminal.innerText += `Unknown command: ${cmd}\n> `;
       }
