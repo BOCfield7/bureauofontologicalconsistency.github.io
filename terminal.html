@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal</title>
   <style>
     html, body {
@@ -65,6 +65,8 @@
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
 
+    const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"]; // protection
+
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
       const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
@@ -113,65 +115,48 @@
       }
     });
 
-    function terminalOutput(msg) {
-      terminal.innerText += msg + "\n> ";
-    }
-
     function handleCommand(cmd) {
-      const command = cmd.toUpperCase();
-      if (command === "HELP") {
-        terminalOutput(
+      const upper = cmd.toUpperCase();
+      if (upper === "HELP") {
+        terminal.innerText += 
           "AVAILABLE COMMANDS:\n" +
           "DIR - List files\n" +
           "OPEN <FILENAME> - View file\n" +
-          "CONNECT QRT - Attempt handshake\n" +
-          "CLEAR - Clear screen\n" +
-          "CD <DIR> - Change directory (disabled)\n" +
-          "PING <TARGET> - ping\n" +
-          "TRACERT <TARGET> - traceroute\n" +
-          "WHOAMI - Display user ID\n" +
-          "EXIT - Stop terminal"
-        );
-      } else if (command === "DIR") {
-        terminalOutput("Directory of /docs\n\n" + files.map(f => `- ${f}`).join("\n"));
-      } else if (command.startsWith("OPEN ")) {
+          "CONNECT QRT - Attempt remote handshake\n" +
+          "ATI, AT&C?, etc. - Echo modem response\n" +
+          "CLEAR - Clear screen\n";
+      } else if (upper === "DIR") {
+        terminal.innerText += "Directory of /docs\n\n";
+        files.forEach(f => terminal.innerText += `- ${f}\n`);
+      } else if (upper.startsWith("OPEN ")) {
         const filename = cmd.slice(5).trim();
         if (files.includes(filename)) {
-          terminalOutput(`Opening ${filename}...`);
+          terminal.innerText += `Opening ${filename}...\n`;
           window.open(`docs/${filename}`, '_blank');
         } else {
-          terminalOutput(`File not found: ${filename}`);
+          terminal.innerText += `File not found: ${filename}\n`;
         }
-      } else if (command.startsWith("CONNECT QRT")) {
-        terminalOutput("Attempting remote QRT handshake...");
-        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app")
+      } else if (upper === "CLEAR") {
+        terminal.innerText = "";
+      } else if (upper === "CONNECT QRT") {
+        terminal.innerText += "Initiating remote handshake to QRT...\n";
+        const bleen = new Audio("bleen_dialup.wav");
+        bleen.play();
+        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app/api/handshake")
           .then(res => res.text())
-          .then(data => terminalOutput("QRT RESPONSE:\n" + data))
-          .catch(err => terminalOutput("⚠ Handshake failed: " + err.message));
-      } else if (command.startsWith("CD ")) {
-        terminalOutput("Access denied: directory permissions restricted.");
-      } else if (command.startsWith("PING ")) {
-        const target = cmd.slice(5).trim();
-        for (let i = 0; i < 4; i++) {
-          const delay = Math.floor(Math.random() * 200) + 30;
-          terminal.innerText += `Reply from ${target}: time=${delay}ms\n`;
+          .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
+          .catch(err => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
+      } else if (upper.startsWith("AT")) {
+        if (forbiddenCommands.some(f => upper.startsWith(f))) {
+          terminal.innerText += `\nPermission denied. Command restricted.\n> `;
+          return;
         }
-      } else if (command.startsWith("TRACERT ")) {
-        const target = cmd.slice(8).trim();
-        for (let i = 1; i <= 6; i++) {
-          const delay = Math.floor(Math.random() * 100) + 50;
-          terminal.innerText += `${i}    10.${i}.0.${i}    ${delay}ms\n`;
-        }
-        terminal.innerText += `Trace complete to ${target}\n> `;
-      } else if (command === "WHOAMI") {
-        terminalOutput("field.agent.073");
-      } else if (command === "CLEAR") {
-        terminal.innerText = "> ";
-      } else if (command === "EXIT") {
-        terminalOutput("Terminating session...");
-        inputLine.style.display = "none";
+        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app/api/modem?cmd=" + encodeURIComponent(cmd))
+          .then(res => res.text())
+          .then(txt => terminal.innerText += `${txt}\n> `)
+          .catch(err => terminal.innerText += `Modem error or offline.\n> `);
       } else {
-        terminalOutput(`Unknown command: ${cmd}`);
+        terminal.innerText += `Unknown command: ${cmd}\n> `;
       }
     }
 
