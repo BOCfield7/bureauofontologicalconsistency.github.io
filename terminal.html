@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -114,32 +113,43 @@
       }
     });
 
+    function terminalOutput(msg) {
+      terminal.innerText += msg + "\n> ";
+    }
+
     function handleCommand(cmd) {
       const command = cmd.toUpperCase();
       if (command === "HELP") {
-        terminal.innerText += 
+        terminalOutput(
           "AVAILABLE COMMANDS:\n" +
           "DIR - List files\n" +
           "OPEN <FILENAME> - View file\n" +
+          "CONNECT QRT - Attempt handshake\n" +
           "CLEAR - Clear screen\n" +
           "CD <DIR> - Change directory (disabled)\n" +
           "PING <TARGET> - ping\n" +
           "TRACERT <TARGET> - traceroute\n" +
           "WHOAMI - Display user ID\n" +
-          "EXIT - Stop terminal\n";
+          "EXIT - Stop terminal"
+        );
       } else if (command === "DIR") {
-        terminal.innerText += "Directory of /docs\n\n";
-        files.forEach(f => terminal.innerText += `- ${f}\n`);
+        terminalOutput("Directory of /docs\n\n" + files.map(f => `- ${f}`).join("\n"));
       } else if (command.startsWith("OPEN ")) {
         const filename = cmd.slice(5).trim();
         if (files.includes(filename)) {
-          terminal.innerText += `Opening ${filename}...\n`;
+          terminalOutput(`Opening ${filename}...`);
           window.open(`docs/${filename}`, '_blank');
         } else {
-          terminal.innerText += `File not found: ${filename}\n`;
+          terminalOutput(`File not found: ${filename}`);
         }
+      } else if (command.startsWith("CONNECT QRT")) {
+        terminalOutput("Attempting remote QRT handshake...");
+        fetch("https://610b-2600-6c51-427f-419b-85d2-6b83-2ce6-33ea.ngrok-free.app")
+          .then(res => res.text())
+          .then(data => terminalOutput("QRT RESPONSE:\n" + data))
+          .catch(err => terminalOutput("⚠ Handshake failed: " + err.message));
       } else if (command.startsWith("CD ")) {
-        terminal.innerText += "Access denied: directory permissions restricted.\n";
+        terminalOutput("Access denied: directory permissions restricted.");
       } else if (command.startsWith("PING ")) {
         const target = cmd.slice(5).trim();
         for (let i = 0; i < 4; i++) {
@@ -152,16 +162,16 @@
           const delay = Math.floor(Math.random() * 100) + 50;
           terminal.innerText += `${i}    10.${i}.0.${i}    ${delay}ms\n`;
         }
-        terminal.innerText += `Trace complete to ${target}\n`;
+        terminal.innerText += `Trace complete to ${target}\n> `;
       } else if (command === "WHOAMI") {
-        terminal.innerText += "field.agent.073\n";
+        terminalOutput("field.agent.073");
       } else if (command === "CLEAR") {
-        terminal.innerText = "";
+        terminal.innerText = "> ";
       } else if (command === "EXIT") {
-        terminal.innerText += "Terminating session...\n";
+        terminalOutput("Terminating session...");
         inputLine.style.display = "none";
       } else {
-        terminal.innerText += `Unknown command: ${cmd}\n`;
+        terminalOutput(`Unknown command: ${cmd}`);
       }
     }
 
