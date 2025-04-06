@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Station 7 Terminal</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       background: #000;
-      color: #fff;
+      color: #0f0;
       font-family: monospace;
       font-size: 16px;
       height: 100%;
@@ -29,27 +29,27 @@
     #input {
       background: #000;
       border: none;
-      color: #fff;
+      color: #0f0;
       font-family: monospace;
       font-size: 16px;
       outline: none;
       width: 100%;
     }
-    @keyframes blink {
-      50% { background: transparent; }
-    }
     .cursor {
       display: inline-block;
       width: 10px;
       height: 18px;
-      background: #fff;
+      background: #0f0;
       animation: blink 1s step-end infinite;
-      margin-left: 2px;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
     }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...\n</div>
+  <div id="terminal">INITIALIZING STATION 7...
+</div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /><span class="cursor"></span></div>
   <audio id="connect-sound" src="modem_connect.wav" autoplay></audio>
 
@@ -57,7 +57,6 @@
     const terminal = document.getElementById('terminal');
     const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-    const connectSound = document.getElementById('connect-sound');
     const endpoint = "https://evenly-positive-loon.ngrok-free.app";
 
     const files = [
@@ -126,10 +125,11 @@
           "OPEN <FILENAME> - View file\n" +
           "CONNECT QRT - Attempt remote handshake\n" +
           "ATI, AT&C?, etc. - Echo modem response\n" +
-          "CLEAR - Clear screen\n";
+          "CLEAR - Clear screen\n> ";
       } else if (upper === "DIR") {
         terminal.innerText += "Directory of /docs\n\n";
         files.forEach(f => terminal.innerText += `- ${f}\n`);
+        terminal.innerText += "> ";
       } else if (upper.startsWith("OPEN ")) {
         const filename = cmd.slice(5).trim();
         if (files.includes(filename)) {
@@ -138,8 +138,10 @@
         } else {
           terminal.innerText += `File not found: ${filename}\n`;
         }
+        terminal.innerText += "> ";
       } else if (upper === "CLEAR") {
         terminal.innerText = "";
+        terminal.innerText += "> ";
       } else if (upper === "CONNECT QRT") {
         terminal.innerText += "Initiating remote handshake to QRT...\n";
         const bleen = new Audio("bleen_with_quantum_input.wav");
@@ -162,7 +164,7 @@
       }
     }
 
-    connectSound.onended = () => {
+    document.getElementById("connect-sound").onended = () => {
       setTimeout(typeBootLine, 1000);
     };
   </script>
