@@ -143,10 +143,12 @@
         terminal.innerText += "Initiating remote handshake to QRT...\n";
         const bleen = new Audio("bleen_with_quantum_input.wav");
         bleen.play();
-        fetch(`${endpoint}/api/handshake`)
-          .then(res => res.text())
-          .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
-          .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
+        bleen.onended = () => {
+          fetch(`${endpoint}/api/handshake`)
+            .then(res => res.text())
+            .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
+            .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
+        };
       } else if (upper.startsWith("AT")) {
         if (forbiddenCommands.some(f => upper.startsWith(f))) {
           terminal.innerText += `\nPermission denied. Command restricted.\n> `;
