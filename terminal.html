@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Station 7 Terminal</title>
   <style>
     html, body {
       margin: 0;
@@ -21,15 +21,6 @@
       height: 90%;
       overflow-y: auto;
     }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #fff;
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink {
-      50% { background: transparent; }
-    }
     #input-line {
       display: flex;
       align-items: center;
@@ -44,23 +35,31 @@
       outline: none;
       width: 100%;
     }
+    @keyframes blink {
+      50% { background: transparent; }
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 18px;
+      background: #fff;
+      animation: blink 1s step-end infinite;
+      margin-left: 2px;
+    }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING MODEM CONNECTION...
-</div>
-  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
-  <audio id="init-audio" src="modem_connect.wav" autoplay></audio>
-  <audio id="bleen-audio" src="bleen_with_quantum_input.wav"></audio>
+  <div id="terminal">INITIALIZING STATION 7...\n</div>
+  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /><span class="cursor"></span></div>
+  <audio id="connect-sound" src="modem_connect.wav" autoplay></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
     const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-    const initAudio = document.getElementById('init-audio');
-    const bleenAudio = document.getElementById('bleen-audio');
-
+    const connectSound = document.getElementById('connect-sound');
     const endpoint = "https://evenly-positive-loon.ngrok-free.app";
+
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
       "BOC-73-RC_Recursion_Event_Report.pdf",
@@ -70,11 +69,43 @@
 
     const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"];
 
-    initAudio.onended = () => {
-      terminal.innerText += "CONNECTED TO STATION 7\n> ";
-      inputLine.style.display = "flex";
-      input.focus();
-    };
+    function generateBleenConnectionString() {
+      const t = Date.now() / 1000;
+      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
+      const f = (t) => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
+      const raw = f(t).toFixed(6);
+      const segments = raw.match(/(\d)\.(\d{2})(\d)/);
+      return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
+    }
+
+    const bootLines = [
+      generateBleenConnectionString(),
+      "STATION 7 [VTERM] READY"
+    ];
+
+    let bootIndex = 0;
+
+    function typeBootLine() {
+      if (bootIndex < bootLines.length) {
+        const line = bootLines[bootIndex];
+        let charIndex = 0;
+        const typeChar = () => {
+          if (charIndex < line.length) {
+            terminal.innerText += line[charIndex++];
+            setTimeout(typeChar, 40);
+          } else {
+            terminal.innerText += "\n";
+            bootIndex++;
+            setTimeout(typeBootLine, 300);
+          }
+        };
+        typeChar();
+      } else {
+        terminal.innerText += "> ";
+        inputLine.style.display = "flex";
+        input.focus();
+      }
+    }
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -88,7 +119,6 @@
 
     function handleCommand(cmd) {
       const upper = cmd.toUpperCase();
-
       if (upper === "HELP") {
         terminal.innerText +=
           "AVAILABLE COMMANDS:\n" +
@@ -109,10 +139,11 @@
           terminal.innerText += `File not found: ${filename}\n`;
         }
       } else if (upper === "CLEAR") {
-        terminal.innerText = "> ";
+        terminal.innerText = "";
       } else if (upper === "CONNECT QRT") {
-        terminal.innerText += "Initiating handshake with QRT...\n";
-        bleenAudio.play();
+        terminal.innerText += "Initiating remote handshake to QRT...\n";
+        const bleen = new Audio("bleen_with_quantum_input.wav");
+        bleen.play();
         fetch(`${endpoint}/api/handshake`)
           .then(res => res.text())
           .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
@@ -122,7 +153,7 @@
           terminal.innerText += `\nPermission denied. Command restricted.\n> `;
           return;
         }
-        fetch(`${endpoint}/api/modem?cmd=` + encodeURIComponent(cmd))
+        fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
           .then(res => res.text())
           .then(txt => terminal.innerText += `${txt}\n> `)
           .catch(() => terminal.innerText += `Modem error or offline.\n> `);
@@ -130,6 +161,10 @@
         terminal.innerText += `Unknown command: ${cmd}\n> `;
       }
     }
+
+    connectSound.onended = () => {
+      setTimeout(typeBootLine, 1000);
+    };
   </script>
 </body>
 </html>
