@@ -3,136 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOC Terminal Access</title>
+  <title>BOC Terminal</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
-      color: #0f0;
+      height: 100%;
+      background: black;
+      color: lime;
       font-family: monospace;
       font-size: 16px;
-      height: 100%;
-      overflow: hidden;
     }
     #terminal {
-      padding: 20px;
+      padding: 10px;
       white-space: pre-wrap;
-      height: 90%;
-      overflow-y: auto;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #0f0;
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink {
-      50% { background: transparent; }
+      overflow-y: scroll;
+      height: 90vh;
     }
     #input-line {
       display: flex;
       align-items: center;
-      display: none;
     }
     #input {
-      background: #000;
+      flex: 1;
+      background: transparent;
       border: none;
-      color: #0f0;
-      font-family: monospace;
-      font-size: 16px;
+      color: inherit;
+      font: inherit;
       outline: none;
-      width: 100%;
+    }
+    .red-mode {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...
-</div>
-  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
+  <div id="terminal"></div>
+  <div id="input-line">&gt; <input id="input" type="text"></div>
+  <audio id="bleenAudio" src="bleen_with_quantum_input.wav"></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
-    const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
+    const inputLine = document.getElementById('input-line');
+    const bleenAudio = document.getElementById('bleenAudio');
+
+    let adminMode = false;
+    let loginStep = 0; // 0 = not started, 1 = awaiting passcode
+    const endpoint = 'https://evenly-positive-loon.ngrok-free.app';
+
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
       "BOC-73-RC_Recursion_Event_Report.pdf",
       "Field_Log_473QRTA.pdf",
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
-    const forbidden = ["ATZ", "AT&W", "AT&F", "ATS"];
-    let admin = false;
 
-    const boot = [
-      `CONNECTED TO STRING ${Math.floor(Math.random()*9)+1}.${Math.floor(Math.random()*90)+10}.${Math.floor(Math.random()*9)+1}`,
+    const bootSequence = [
+      "INITIALIZING STATION 7...",
+      `CONNECTED TO STRING ${generateBleenString()}`,
       "STATION 7 [VTERM] READY"
     ];
-    let b = 0;
-    function typeBoot() {
-      if (b < boot.length) {
-        let line = boot[b], i = 0;
-        (function type() {
-          if (i < line.length) {
-            terminal.innerText += line[i++];
-            setTimeout(type, 35);
+
+    function generateBleenString() {
+      const t = Date.now() / 1000;
+      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
+      const f = t => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
+      const raw = f(t).toFixed(6);
+      const [_, a, b, c] = raw.match(/(\d)\.(\d{2})(\d)/);
+      return `${a}.${b}.${c}`;
+    }
+
+    function printLine(text = '') {
+      terminal.innerText += text + "\n";
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function playBleen() {
+      bleenAudio.currentTime = 0;
+      bleenAudio.play();
+    }
+
+    function runBoot() {
+      let i = 0;
+      const interval = setInterval(() => {
+        printLine(bootSequence[i]);
+        i++;
+        if (i >= bootSequence.length) {
+          clearInterval(interval);
+          printLine('> ');
+          input.focus();
+        }
+      }, 1000);
+    }
+
+    function setAdminMode() {
+      adminMode = true;
+      document.body.classList.add('red-mode');
+      printLine("ACCESS LEVEL: FIELD7 - FULL QRT AUTH GRANTED");
+    }
+
+    function handleCommand(cmd) {
+      const upper = cmd.toUpperCase();
+
+      if (loginStep === 1) {
+        if (cmd === "immutable bleen equation") {
+          setAdminMode();
+        } else {
+          printLine("ACCESS DENIED.");
+        }
+        loginStep = 0;
+        return;
+      }
+
+      switch (upper) {
+        case "LOGIN FIELD7":
+          printLine("ENTER PASSCODE:");
+          loginStep = 1;
+          break;
+        case "HELP":
+          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILE>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nLOGIN FIELD7");
+          break;
+        case "CLEAR":
+          terminal.innerText = "";
+          break;
+        case "DIR":
+          files.forEach(f => printLine(`- ${f}`));
+          break;
+        case "BLEEN DIAL":
+          printLine("Injecting Bleen carrier...");
+          playBleen();
+          break;
+        default:
+          if (upper.startsWith("OPEN ")) {
+            const file = cmd.slice(5).trim();
+            if (files.includes(file)) {
+              window.open(`docs/${file}`, '_blank');
+            } else {
+              printLine("FILE NOT FOUND");
+            }
+          } else if (upper.startsWith("AT")) {
+            fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
+              .then(res => res.text())
+              .then(txt => printLine(txt))
+              .catch(() => printLine("QRT LINK ERROR"));
           } else {
-            terminal.innerText += "\n";
-            b++;
-            setTimeout(typeBoot, 300);
+            printLine("Unknown command: " + cmd);
           }
-        })();
-      } else {
-        terminal.innerText += "> ";
-        inputLine.style.display = "flex";
-        input.focus();
       }
     }
 
     input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         const cmd = input.value.trim();
-        terminal.innerText += `> ${cmd}\n`;
-        handle(cmd);
+        printLine("> " + cmd);
         input.value = "";
-        terminal.scrollTop = terminal.scrollHeight;
+        handleCommand(cmd);
       }
     });
 
-    function handle(cmd) {
-      const uc = cmd.toUpperCase();
-      if (!admin && cmd === "login Field7 immutable bleen equation") {
-        admin = true;
-        document.body.style.color = "#f00";
-        terminal.innerText += "ADMIN LOGIN ACCEPTED - QRT INTERFACE ACTIVE\n> ";
-        return;
-      }
-      if (uc === "HELP") {
-        terminal.innerText +=
-          "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View\nCONNECT QRT - Remote handshake\nATI, AT&C? - Modem status\nCLEAR - Clear terminal\nLOGIN <USER> <PASS> - Admin access\n> ";
-      } else if (uc === "DIR") {
-        terminal.innerText += "Directory of /docs\n\n" + files.map(f => `- ${f}`).join("\n") + "\n> ";
-      } else if (uc.startsWith("OPEN ")) {
-        const f = cmd.slice(5).trim();
-        terminal.innerText += files.includes(f) ? `Opening ${f}...\n> ` : `File not found: ${f}\n> `;
-        if (files.includes(f)) window.open(`docs/${f}`, '_blank');
-      } else if (uc === "CLEAR") {
-        terminal.innerText = "";
-      } else if (uc === "CONNECT QRT") {
-        if (!admin) return terminal.innerText += "Permission denied.\n> ";
-        terminal.innerText += "Initiating remote QRT handshake...\n";
-        fetch(`${endpoint}/api/handshake`).then(r => r.text()).then(t => terminal.innerText += `${t}\n> `).catch(() => terminal.innerText += "No response.\n> ");
-      } else if (uc.startsWith("AT")) {
-        if (!admin) return terminal.innerText += "Permission denied.\n> ";
-        if (forbidden.some(x => uc.startsWith(x))) return terminal.innerText += "Command blocked.\n> ";
-        fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`).then(r => r.text()).then(t => terminal.innerText += `${t}\n> `).catch(() => terminal.innerText += "Modem error.\n> ");
-      } else {
-        terminal.innerText += `Unknown command: ${cmd}\n> `;
-      }
-    }
-
-    setTimeout(typeBoot, 1000);
+    runBoot();
   </script>
 </body>
 </html>
