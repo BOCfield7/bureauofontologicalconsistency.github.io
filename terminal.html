@@ -44,13 +44,11 @@
       outline: none;
       width: 100%;
     }
-    iframe {
-      display: none;
-    }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...</div>
+  <div id="terminal">INITIALIZING STATION 7...
+</div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
   <audio id="bleen-audio" src="bleen_with_quantum_input.wav" autoplay></audio>
 
@@ -59,7 +57,6 @@
     const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
     const audio = document.getElementById('bleen-audio');
-    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
 
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
@@ -69,6 +66,7 @@
     ];
 
     const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"];
+    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
 
     function generateBleenConnectionString() {
       const t = Date.now() / 1000;
@@ -120,7 +118,6 @@
 
     function handleCommand(cmd) {
       const upper = cmd.toUpperCase();
-
       if (upper === "HELP") {
         terminal.innerText += 
           "AVAILABLE COMMANDS:\n" +
@@ -144,43 +141,21 @@
         terminal.innerText = "";
       } else if (upper === "CONNECT QRT") {
         terminal.innerText += "Initiating remote handshake to QRT...\n";
-
         const bleen = new Audio("bleen_with_quantum_input.wav");
         bleen.play();
-
-        const iframe = document.getElementById("qrt-iframe") || document.createElement("iframe");
-        iframe.id = "qrt-iframe";
-        iframe.src = `${endpoint}/api/handshake`;
-        document.body.appendChild(iframe);
-
-        setTimeout(() => {
-          fetch(`${endpoint}/api/modem?cmd=ATI`)
-            .then(res => res.text())
-            .then(txt => {
-              terminal.innerText += `\nQRT Response: ${txt}\n> `;
-              terminal.scrollTop = terminal.scrollHeight;
-            })
-            .catch(() => {
-              terminal.innerText += `\nHandshake failed. No response from QRT.\n> `;
-              terminal.scrollTop = terminal.scrollHeight;
-            });
-        }, 3000);
-
+        fetch(`${endpoint}/api/handshake`)
+          .then(res => res.json())
+          .then(json => terminal.innerText += `\nQRT Response: ${json.status}\n> `)
+          .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
       } else if (upper.startsWith("AT")) {
         if (forbiddenCommands.some(f => upper.startsWith(f))) {
           terminal.innerText += `\nPermission denied. Command restricted.\n> `;
           return;
         }
-        fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
+        fetch(`${endpoint}/api/modem?cmd=` + encodeURIComponent(cmd))
           .then(res => res.text())
-          .then(txt => {
-            terminal.innerText += `${txt}\n> `;
-            terminal.scrollTop = terminal.scrollHeight;
-          })
-          .catch(() => {
-            terminal.innerText += `Modem error or offline.\n> `;
-            terminal.scrollTop = terminal.scrollHeight;
-          });
+          .then(txt => terminal.innerText += `${txt}\n> `)
+          .catch(() => terminal.innerText += `Modem error or offline.\n> `);
       } else {
         terminal.innerText += `Unknown command: ${cmd}\n> `;
       }
