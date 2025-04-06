@@ -1,113 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOC Terminal</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOC Terminal Access</title>
   <style>
-    body {
-      background-color: #000;
-      color: #00FF00;
-      font-family: monospace;
+    html, body {
       margin: 0;
-      padding: 20px;
-      animation: flicker 0.15s ease-in-out 3;
+      padding: 0;
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      font-size: 16px;
+      height: 100%;
+      overflow: hidden;
     }
-
-    @keyframes flicker {
-      0% { opacity: 1; }
-      25% { opacity: 0.5; }
-      50% { opacity: 0.2; }
-      75% { opacity: 0.6; }
-      100% { opacity: 1; }
-    }
-
     #terminal {
-      width: 640px;
-      margin: 0 auto;
-      border: 2px solid #00FF00;
       padding: 20px;
-      background-color: #000;
-      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
-    }
-
-    #output {
       white-space: pre-wrap;
-      height: 300px;
+      height: 90%;
       overflow-y: auto;
-      overflow-x: hidden;
-      margin-bottom: 10px;
     }
-
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #0f0;
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      50% { background: transparent; }
+    }
+    #input-line {
+      display: flex;
+      align-items: center;
+      display: none;
+    }
     #input {
-      width: 100%;
       background: #000;
       border: none;
-      color: #00FF00;
+      color: #0f0;
       font-family: monospace;
-      font-size: 1em;
+      font-size: 16px;
       outline: none;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <div id="terminal">
-    <div id="output"></div>
-    <input type="text" id="input" autofocus onkeydown="processInput(event)" />
-  </div>
+  <div id="terminal">INITIALIZING STATION 7...
+</div>
+  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
 
   <script>
-    const output = document.getElementById('output');
+    const terminal = document.getElementById('terminal');
+    const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-
+    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
       "BOC-73-RC_Recursion_Event_Report.pdf",
       "Field_Log_473QRTA.pdf",
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
+    const forbidden = ["ATZ", "AT&W", "AT&F", "ATS"];
+    let admin = false;
 
-    // Initial terminal load
-    output.innerHTML = 'Initializing Station 7...<br>Type HELP to begin.<br>';
-
-    function processInput(e) {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim();
-        if (cmd === '') return;
-        output.innerHTML += `> ${cmd}<br>`;
-        handleCommand(cmd);
-        input.value = '';
-        output.scrollTop = output.scrollHeight;
-      }
-    }
-
-    function handleCommand(cmd) {
-      const command = cmd.toUpperCase();
-
-      if (command === 'HELP') {
-        output.innerHTML += 'AVAILABLE COMMANDS:<br>DIR - List files<br>OPEN &lt;FILENAME&gt; - View file<br>CLEAR - Clear screen<br>';
-      } else if (command === 'DIR') {
-        output.innerHTML += files.map(f => '- ' + f).join('<br>') + '<br>';
-      } else if (command.startsWith('OPEN ')) {
-        const filename = cmd.slice(5).trim();
-        if (files.includes(filename)) {
-          output.innerHTML += `Opening ${filename}...<br>`;
-          window.open(`docs/${filename}`, '_blank');
-        } else {
-          output.innerHTML += `File not found: ${filename}<br>`;
-        }
-      } else if (command === 'CLEAR') {
-        output.innerHTML = '';
-      } else if (command === 'WHOAMI') {
-        output.innerHTML += 'Field Agent: Torres, D.<br>';
-      } else if (command === 'STATUS') {
-        output.innerHTML += 'Station 7 temporal sync: LOCKED<br>Bleen channel: ACTIVE<br>';
+    const boot = [
+      `CONNECTED TO STRING ${Math.floor(Math.random()*9)+1}.${Math.floor(Math.random()*90)+10}.${Math.floor(Math.random()*9)+1}`,
+      "STATION 7 [VTERM] READY"
+    ];
+    let b = 0;
+    function typeBoot() {
+      if (b < boot.length) {
+        let line = boot[b], i = 0;
+        (function type() {
+          if (i < line.length) {
+            terminal.innerText += line[i++];
+            setTimeout(type, 35);
+          } else {
+            terminal.innerText += "\n";
+            b++;
+            setTimeout(typeBoot, 300);
+          }
+        })();
       } else {
-        output.innerHTML += `Unknown command: ${cmd}<br>`;
+        terminal.innerText += "> ";
+        inputLine.style.display = "flex";
+        input.focus();
       }
-
-      output.scrollTop = output.scrollHeight;
     }
+
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim();
+        terminal.innerText += `> ${cmd}\n`;
+        handle(cmd);
+        input.value = "";
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+    });
+
+    function handle(cmd) {
+      const uc = cmd.toUpperCase();
+      if (!admin && cmd === "login Field7 immutable bleen equation") {
+        admin = true;
+        document.body.style.color = "#f00";
+        terminal.innerText += "ADMIN LOGIN ACCEPTED - QRT INTERFACE ACTIVE\n> ";
+        return;
+      }
+      if (uc === "HELP") {
+        terminal.innerText +=
+          "AVAILABLE COMMANDS:\nDIR - List files\nOPEN <FILENAME> - View\nCONNECT QRT - Remote handshake\nATI, AT&C? - Modem status\nCLEAR - Clear terminal\nLOGIN <USER> <PASS> - Admin access\n> ";
+      } else if (uc === "DIR") {
+        terminal.innerText += "Directory of /docs\n\n" + files.map(f => `- ${f}`).join("\n") + "\n> ";
+      } else if (uc.startsWith("OPEN ")) {
+        const f = cmd.slice(5).trim();
+        terminal.innerText += files.includes(f) ? `Opening ${f}...\n> ` : `File not found: ${f}\n> `;
+        if (files.includes(f)) window.open(`docs/${f}`, '_blank');
+      } else if (uc === "CLEAR") {
+        terminal.innerText = "";
+      } else if (uc === "CONNECT QRT") {
+        if (!admin) return terminal.innerText += "Permission denied.\n> ";
+        terminal.innerText += "Initiating remote QRT handshake...\n";
+        fetch(`${endpoint}/api/handshake`).then(r => r.text()).then(t => terminal.innerText += `${t}\n> `).catch(() => terminal.innerText += "No response.\n> ");
+      } else if (uc.startsWith("AT")) {
+        if (!admin) return terminal.innerText += "Permission denied.\n> ";
+        if (forbidden.some(x => uc.startsWith(x))) return terminal.innerText += "Command blocked.\n> ";
+        fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`).then(r => r.text()).then(t => terminal.innerText += `${t}\n> `).catch(() => terminal.innerText += "Modem error.\n> ");
+      } else {
+        terminal.innerText += `Unknown command: ${cmd}\n> `;
+      }
+    }
+
+    setTimeout(typeBoot, 1000);
   </script>
 </body>
 </html>
