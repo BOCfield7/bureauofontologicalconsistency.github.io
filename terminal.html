@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terminal</title>
   <style>
     html, body {
@@ -50,13 +50,16 @@
   <div id="terminal">INITIALIZING STATION 7...
 </div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
+
+  <audio id="boot-audio" src="station7_connect.wav"></audio>
   <audio id="bleen-audio" src="bleen_with_quantum_input.wav"></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
     const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-    const audio = document.getElementById('bleen-audio');
+    const bootAudio = document.getElementById('boot-audio');
+    const bleenAudio = document.getElementById('bleen-audio');
 
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
@@ -79,7 +82,7 @@
 
     const bootLines = [
       generateBleenConnectionString(),
-      "STATION 7 [VTERM] READY"
+      "CONNECTED TO STATION 7 [VTERM] READY"
     ];
 
     let bootIndex = 0;
@@ -105,6 +108,15 @@
         input.focus();
       }
     }
+
+    // Begin after boot sound finishes
+    bootAudio.onended = () => {
+      setTimeout(typeBootLine, 500);
+    };
+
+    window.onload = () => {
+      bootAudio.play();
+    };
 
     input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -140,9 +152,9 @@
       } else if (upper === "CLEAR") {
         terminal.innerText = "";
       } else if (upper === "CONNECT QRT") {
-        terminal.innerText += "Initiating remote handshake to QRT...\n";
-        audio.play();
-        fetch(`${endpoint}/api/modem?cmd=ATA`)
+        terminal.innerText += "Attempting remote QRT handshake...\n";
+        bleenAudio.play();
+        fetch(`${endpoint}/api/handshake`)
           .then(res => res.text())
           .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
           .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
@@ -159,10 +171,6 @@
         terminal.innerText += `Unknown command: ${cmd}\n> `;
       }
     }
-
-    audio.onended = () => {
-      setTimeout(typeBootLine, 1000);
-    };
   </script>
 </body>
 </html>
