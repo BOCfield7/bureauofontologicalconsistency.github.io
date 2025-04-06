@@ -50,7 +50,7 @@
   <div id="terminal">INITIALIZING STATION 7...
 </div>
   <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
-  <audio id="bleen-audio" src="bleen_with_quantum_input.wav" autoplay></audio>
+  <audio id="bleen-audio" src="bleen_with_quantum_input.wav"></audio>
 
   <script>
     const terminal = document.getElementById('terminal');
@@ -141,11 +141,10 @@
         terminal.innerText = "";
       } else if (upper === "CONNECT QRT") {
         terminal.innerText += "Initiating remote handshake to QRT...\n";
-        const bleen = new Audio("bleen_with_quantum_input.wav");
-        bleen.play();
-        fetch(`${endpoint}/api/handshake`)
-          .then(res => res.json())
-          .then(json => terminal.innerText += `\nQRT Response: ${json.status}\n> `)
+        audio.play();
+        fetch(`${endpoint}/api/modem?cmd=ATA`)
+          .then(res => res.text())
+          .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
           .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
       } else if (upper.startsWith("AT")) {
         if (forbiddenCommands.some(f => upper.startsWith(f))) {
