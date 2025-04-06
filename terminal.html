@@ -3,61 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Station 7 Terminal</title>
+  <title>BOC Terminal</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      color: #0f0;
+    body {
+      background-color: #000;
+      color: #00FF00;
       font-family: monospace;
-      font-size: 16px;
-      height: 100%;
-      overflow: hidden;
-    }
-    #terminal {
+      margin: 0;
       padding: 20px;
+      animation: flicker 0.15s ease-in-out 3;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      25% { opacity: 0.5; }
+      50% { opacity: 0.2; }
+      75% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    #terminal {
+      width: 640px;
+      margin: 0 auto;
+      border: 2px solid #00FF00;
+      padding: 20px;
+      background-color: #000;
+      box-shadow: 0 0 25px rgba(0, 255, 0, 0.3);
+    }
+
+    #output {
       white-space: pre-wrap;
-      height: 90%;
+      height: 300px;
       overflow-y: auto;
+      overflow-x: hidden;
+      margin-bottom: 10px;
     }
-    #input-line {
-      display: flex;
-      align-items: center;
-      display: none;
-    }
+
     #input {
+      width: 100%;
       background: #000;
       border: none;
-      color: #0f0;
+      color: #00FF00;
       font-family: monospace;
-      font-size: 16px;
+      font-size: 1em;
       outline: none;
-      width: 100%;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      height: 18px;
-      background: #0f0;
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink {
-      50% { background: transparent; }
     }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...
-</div>
-  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /><span class="cursor"></span></div>
-  <audio id="connect-sound" src="modem_connect.wav" autoplay></audio>
+  <div id="terminal">
+    <div id="output"></div>
+    <input type="text" id="input" autofocus onkeydown="processInput(event)" />
+  </div>
 
   <script>
-    const terminal = document.getElementById('terminal');
-    const inputLine = document.getElementById('input-line');
+    const output = document.getElementById('output');
     const input = document.getElementById('input');
-    const endpoint = "https://evenly-positive-loon.ngrok-free.app";
 
     const files = [
       "BOC-42-R_Artifact_Incident_Form.pdf",
@@ -66,107 +67,47 @@
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
     ];
 
-    const forbiddenCommands = ["ATZ", "AT&W", "AT&F", "ATS"];
+    // Initial terminal load
+    output.innerHTML = 'Initializing Station 7...<br>Type HELP to begin.<br>';
 
-    function generateBleenConnectionString() {
-      const t = Date.now() / 1000;
-      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
-      const f = (t) => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
-      const raw = f(t).toFixed(6);
-      const segments = raw.match(/(\d)\.(\d{2})(\d)/);
-      return `CONNECTED TO STRING ${segments[1]}.${segments[2]}.${segments[3]}`;
-    }
-
-    const bootLines = [
-      generateBleenConnectionString(),
-      "STATION 7 [VTERM] READY"
-    ];
-
-    let bootIndex = 0;
-
-    function typeBootLine() {
-      if (bootIndex < bootLines.length) {
-        const line = bootLines[bootIndex];
-        let charIndex = 0;
-        const typeChar = () => {
-          if (charIndex < line.length) {
-            terminal.innerText += line[charIndex++];
-            setTimeout(typeChar, 40);
-          } else {
-            terminal.innerText += "\n";
-            bootIndex++;
-            setTimeout(typeBootLine, 300);
-          }
-        };
-        typeChar();
-      } else {
-        terminal.innerText += "> ";
-        inputLine.style.display = "flex";
-        input.focus();
+    function processInput(e) {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim();
+        if (cmd === '') return;
+        output.innerHTML += `> ${cmd}<br>`;
+        handleCommand(cmd);
+        input.value = '';
+        output.scrollTop = output.scrollHeight;
       }
     }
-
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const command = input.value.trim();
-        terminal.innerText += `> ${command}\n`;
-        handleCommand(command);
-        input.value = "";
-        terminal.scrollTop = terminal.scrollHeight;
-      }
-    });
 
     function handleCommand(cmd) {
-      const upper = cmd.toUpperCase();
-      if (upper === "HELP") {
-        terminal.innerText +=
-          "AVAILABLE COMMANDS:\n" +
-          "DIR - List files\n" +
-          "OPEN <FILENAME> - View file\n" +
-          "CONNECT QRT - Attempt remote handshake\n" +
-          "ATI, AT&C?, etc. - Echo modem response\n" +
-          "CLEAR - Clear screen\n> ";
-      } else if (upper === "DIR") {
-        terminal.innerText += "Directory of /docs\n\n";
-        files.forEach(f => terminal.innerText += `- ${f}\n`);
-        terminal.innerText += "> ";
-      } else if (upper.startsWith("OPEN ")) {
+      const command = cmd.toUpperCase();
+
+      if (command === 'HELP') {
+        output.innerHTML += 'AVAILABLE COMMANDS:<br>DIR - List files<br>OPEN &lt;FILENAME&gt; - View file<br>CLEAR - Clear screen<br>';
+      } else if (command === 'DIR') {
+        output.innerHTML += files.map(f => '- ' + f).join('<br>') + '<br>';
+      } else if (command.startsWith('OPEN ')) {
         const filename = cmd.slice(5).trim();
         if (files.includes(filename)) {
-          terminal.innerText += `Opening ${filename}...\n`;
+          output.innerHTML += `Opening ${filename}...<br>`;
           window.open(`docs/${filename}`, '_blank');
         } else {
-          terminal.innerText += `File not found: ${filename}\n`;
+          output.innerHTML += `File not found: ${filename}<br>`;
         }
-        terminal.innerText += "> ";
-      } else if (upper === "CLEAR") {
-        terminal.innerText = "";
-        terminal.innerText += "> ";
-      } else if (upper === "CONNECT QRT") {
-        terminal.innerText += "Initiating remote handshake to QRT...\n";
-        const bleen = new Audio("bleen_with_quantum_input.wav");
-        bleen.play();
-        fetch(`${endpoint}/api/handshake`)
-          .then(res => res.text())
-          .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
-          .catch(() => terminal.innerText += `\nHandshake failed. No response from QRT.\n> `);
-      } else if (upper.startsWith("AT")) {
-        if (forbiddenCommands.some(f => upper.startsWith(f))) {
-          terminal.innerText += `\nPermission denied. Command restricted.\n> `;
-          return;
-        }
-        fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
-          .then(res => res.text())
-          .then(txt => terminal.innerText += `${txt}\n> `)
-          .catch(() => terminal.innerText += `Modem error or offline.\n> `);
+      } else if (command === 'CLEAR') {
+        output.innerHTML = '';
+      } else if (command === 'WHOAMI') {
+        output.innerHTML += 'Field Agent: Torres, D.<br>';
+      } else if (command === 'STATUS') {
+        output.innerHTML += 'Station 7 temporal sync: LOCKED<br>Bleen channel: ACTIVE<br>';
       } else {
-        terminal.innerText += `Unknown command: ${cmd}\n> `;
+        output.innerHTML += `Unknown command: ${cmd}<br>`;
       }
-    }
 
-    document.getElementById("connect-sound").onended = () => {
-      setTimeout(typeBootLine, 1000);
-    };
+      output.scrollTop = output.scrollHeight;
+    }
   </script>
 </body>
 </html>
