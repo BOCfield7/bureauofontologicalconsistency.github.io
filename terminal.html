@@ -32,7 +32,8 @@
       font: inherit;
       outline: none;
     }
-    .red-mode {
+    .admin-mode {
+      background: black;
       color: red;
     }
   </style>
@@ -49,7 +50,7 @@
     const bleenAudio = document.getElementById('bleenAudio');
 
     let adminMode = false;
-    let loginStep = 0; // 0 = not started, 1 = awaiting passcode
+    let loginStep = 0;
     const endpoint = 'https://evenly-positive-loon.ngrok-free.app';
 
     const files = [
@@ -99,7 +100,7 @@
 
     function setAdminMode() {
       adminMode = true;
-      document.body.classList.add('red-mode');
+      document.body.classList.add('admin-mode');
       printLine("ACCESS LEVEL: FIELD7 - FULL QRT AUTH GRANTED");
     }
 
@@ -122,12 +123,18 @@
           loginStep = 1;
           break;
         case "HELP":
-          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILE>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nLOGIN FIELD7");
+          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILENAME>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nEXIT\nLOGIN FIELD7");
           break;
         case "CLEAR":
           terminal.innerText = "";
           break;
+        case "EXIT":
+          printLine("SESSION TERMINATED.");
+          input.disabled = true;
+          inputLine.style.display = "none";
+          break;
         case "DIR":
+          printLine("Directory of /docs");
           files.forEach(f => printLine(`- ${f}`));
           break;
         case "BLEEN DIAL":
@@ -138,11 +145,16 @@
           if (upper.startsWith("OPEN ")) {
             const file = cmd.slice(5).trim();
             if (files.includes(file)) {
+              printLine(`Opening ${file}...`);
               window.open(`docs/${file}`, '_blank');
             } else {
               printLine("FILE NOT FOUND");
             }
           } else if (upper.startsWith("AT")) {
+            if (!adminMode) {
+              printLine("ACCESS DENIED. LOGIN REQUIRED.");
+              return;
+            }
             fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
               .then(res => res.text())
               .then(txt => printLine(txt))
