@@ -3,151 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bureau Terminal</title>
+  <title>BOC Terminal</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background: #000;
-      color: #f00;
+      height: 100%;
+      background: black;
+      color: lime;
       font-family: monospace;
       font-size: 16px;
-      height: 100%;
-      overflow: hidden;
     }
     #terminal {
-      padding: 20px;
+      padding: 10px;
       white-space: pre-wrap;
-      height: 90%;
-      overflow-y: auto;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #f00;
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink {
-      50% { background: transparent; }
+      overflow-y: scroll;
+      height: 90vh;
     }
     #input-line {
       display: flex;
       align-items: center;
     }
     #input {
-      background: #000;
+      flex: 1;
+      background: transparent;
       border: none;
-      color: #f00;
-      font-family: monospace;
-      font-size: 16px;
+      color: inherit;
+      font: inherit;
       outline: none;
-      width: 100%;
+    }
+    .red-mode {
+      color: red;
     }
   </style>
 </head>
 <body>
-  <div id="terminal">INITIALIZING STATION 7...
-</div>
-  <div id="input-line"><span>&gt; </span><input id="input" type="text" autofocus /></div>
-  <audio id="bleen-audio" src="bleen_with_quantum_input.wav"></audio>
+  <div id="terminal"></div>
+  <div id="input-line">&gt; <input id="input" type="text"></div>
+  <audio id="bleenAudio" src="bleen_with_quantum_input.wav"></audio>
+
   <script>
     const terminal = document.getElementById('terminal');
-    const inputLine = document.getElementById('input-line');
     const input = document.getElementById('input');
-    const audio = document.getElementById('bleen-audio');
+    const inputLine = document.getElementById('input-line');
+    const bleenAudio = document.getElementById('bleenAudio');
 
-    const endpoint = "https://your-ngrok-domain.ngrok-free.app"; // Update with your endpoint
+    let adminMode = false;
+    let loginStep = 0; // 0 = not started, 1 = awaiting passcode
+    const endpoint = 'https://evenly-positive-loon.ngrok-free.app';
 
-    const bootLines = [
-      "CONNECTED TO STRING 7.14.9",
+    const files = [
+      "BOC-42-R_Artifact_Incident_Form.pdf",
+      "BOC-73-RC_Recursion_Event_Report.pdf",
+      "Field_Log_473QRTA.pdf",
+      "NTIA_Field_Memo_BVHA_Recursion.pdf"
+    ];
+
+    const bootSequence = [
+      "INITIALIZING STATION 7...",
+      `CONNECTED TO STRING ${generateBleenString()}`,
       "STATION 7 [VTERM] READY"
     ];
 
-    let bootIndex = 0;
-
-    function typeBootLine() {
-      if (bootIndex < bootLines.length) {
-        const line = bootLines[bootIndex];
-        let charIndex = 0;
-        const typeChar = () => {
-          if (charIndex < line.length) {
-            terminal.innerText += line[charIndex++];
-            setTimeout(typeChar, 40);
-          } else {
-            terminal.innerText += "\n";
-            bootIndex++;
-            setTimeout(typeBootLine, 300);
-          }
-        };
-        typeChar();
-      } else {
-        terminal.innerText += "> ";
-        input.focus();
-      }
+    function generateBleenString() {
+      const t = Date.now() / 1000;
+      const α = 1.01, β = 1.99, ω = 2 * Math.PI / 7;
+      const f = t => α * Math.sin(ω * t + 0.42) + β * Math.cos(ω * t);
+      const raw = f(t).toFixed(6);
+      const [_, a, b, c] = raw.match(/(\d)\.(\d{2})(\d)/);
+      return `${a}.${b}.${c}`;
     }
 
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        const command = input.value.trim();
-        terminal.innerText += `${command}\n`;
-        handleCommand(command);
-        input.value = "";
-        terminal.scrollTop = terminal.scrollHeight;
-      }
-    });
+    function printLine(text = '') {
+      terminal.innerText += text + "\n";
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function playBleen() {
+      bleenAudio.currentTime = 0;
+      bleenAudio.play();
+    }
+
+    function runBoot() {
+      let i = 0;
+      const interval = setInterval(() => {
+        printLine(bootSequence[i]);
+        i++;
+        if (i >= bootSequence.length) {
+          clearInterval(interval);
+          printLine('> ');
+          input.focus();
+        }
+      }, 1000);
+    }
+
+    function setAdminMode() {
+      adminMode = true;
+      document.body.classList.add('red-mode');
+      printLine("ACCESS LEVEL: FIELD7 - FULL QRT AUTH GRANTED");
+    }
 
     function handleCommand(cmd) {
       const upper = cmd.toUpperCase();
+
+      if (loginStep === 1) {
+        if (cmd === "immutable bleen equation") {
+          setAdminMode();
+        } else {
+          printLine("ACCESS DENIED.");
+        }
+        loginStep = 0;
+        return;
+      }
+
       switch (upper) {
+        case "LOGIN FIELD7":
+          printLine("ENTER PASSCODE:");
+          loginStep = 1;
+          break;
         case "HELP":
-          terminal.innerText +=
-            "AVAILABLE COMMANDS:\n" +
-            "HELP, CLEAR, EXIT, REFRESH, BACK\n" +
-            "CONNECT QRT - Dial QRT modem\n" +
-            "AT, ATI, ATA, ATDT, etc. - Send to modem\n";
+          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILE>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nLOGIN FIELD7");
           break;
         case "CLEAR":
           terminal.innerText = "";
           break;
-        case "EXIT":
-          terminal.innerText += "\nTerminating session...\n";
-          input.disabled = true;
+        case "DIR":
+          files.forEach(f => printLine(`- ${f}`));
           break;
-        case "REFRESH":
-          location.reload();
-          break;
-        case "BACK":
-          history.back();
-          break;
-        case "CONNECT QRT":
-          terminal.innerText += "Initiating remote handshake to QRT...\n";
-          audio.play();
-          fetch(`${endpoint}/api/handshake`)
-            .then(res => res.text())
-            .then(txt => terminal.innerText += `\nQRT Response: ${txt}\n> `)
-            .catch(err => terminal.innerText += `\n[HANDSHAKE FAILED] ${err.message}\n> `);
+        case "BLEEN DIAL":
+          printLine("Injecting Bleen carrier...");
+          playBleen();
           break;
         default:
-          if (upper.startsWith("AT")) {
+          if (upper.startsWith("OPEN ")) {
+            const file = cmd.slice(5).trim();
+            if (files.includes(file)) {
+              window.open(`docs/${file}`, '_blank');
+            } else {
+              printLine("FILE NOT FOUND");
+            }
+          } else if (upper.startsWith("AT")) {
             fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
               .then(res => res.text())
-              .then(txt => {
-                if (txt.includes("NO CARRIER")) {
-                  terminal.innerText += `\n[MODEM ERROR] No Carrier Detected.\n> `;
-                } else {
-                  terminal.innerText += `${txt}\n> `;
-                }
-              })
-              .catch(err => terminal.innerText += `\n[MODEM TIMEOUT] ${err.message}\n> `);
+              .then(txt => printLine(txt))
+              .catch(() => printLine("QRT LINK ERROR"));
           } else {
-            terminal.innerText += `Unknown command: ${cmd}\n> `;
+            printLine("Unknown command: " + cmd);
           }
       }
     }
 
-    window.onload = () => {
-      setTimeout(typeBootLine, 500);
-    };
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        const cmd = input.value.trim();
+        printLine("> " + cmd);
+        input.value = "";
+        handleCommand(cmd);
+      }
+    });
+
+    runBoot();
   </script>
 </body>
 </html>
