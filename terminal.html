@@ -1,3 +1,4 @@
+----- START OF FILE: terminal.html -----
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,10 +33,7 @@
       font: inherit;
       outline: none;
     }
-    .admin-mode {
-      background: black;
-      color: red;
-    }
+    .red-mode { color: red; }
   </style>
 </head>
 <body>
@@ -46,7 +44,6 @@
   <script>
     const terminal = document.getElementById('terminal');
     const input = document.getElementById('input');
-    const inputLine = document.getElementById('input-line');
     const bleenAudio = document.getElementById('bleenAudio');
 
     let adminMode = false;
@@ -58,12 +55,6 @@
       "BOC-73-RC_Recursion_Event_Report.pdf",
       "Field_Log_473QRTA.pdf",
       "NTIA_Field_Memo_BVHA_Recursion.pdf"
-    ];
-
-    const bootSequence = [
-      "INITIALIZING STATION 7...",
-      `CONNECTED TO STRING ${generateBleenString()}`,
-      "STATION 7 [VTERM] READY"
     ];
 
     function generateBleenString() {
@@ -86,11 +77,16 @@
     }
 
     function runBoot() {
+      const bootLines = [
+        "INITIALIZING STATION 7...",
+        `CONNECTED TO STRING ${generateBleenString()}`,
+        "STATION 7 [VTERM] READY"
+      ];
       let i = 0;
       const interval = setInterval(() => {
-        printLine(bootSequence[i]);
+        printLine(bootLines[i]);
         i++;
-        if (i >= bootSequence.length) {
+        if (i >= bootLines.length) {
           clearInterval(interval);
           printLine('> ');
           input.focus();
@@ -100,13 +96,12 @@
 
     function setAdminMode() {
       adminMode = true;
-      document.body.classList.add('admin-mode');
+      document.body.classList.add('red-mode');
       printLine("ACCESS LEVEL: FIELD7 - FULL QRT AUTH GRANTED");
     }
 
     function handleCommand(cmd) {
       const upper = cmd.toUpperCase();
-
       if (loginStep === 1) {
         if (cmd === "immutable bleen equation") {
           setAdminMode();
@@ -123,18 +118,12 @@
           loginStep = 1;
           break;
         case "HELP":
-          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILENAME>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nEXIT\nLOGIN FIELD7");
+          printLine("AVAILABLE COMMANDS:\nDIR\nOPEN <FILE>\nATI / ATD / ATA etc.\nBLEEN DIAL\nCLEAR\nLOGIN FIELD7");
           break;
         case "CLEAR":
           terminal.innerText = "";
           break;
-        case "EXIT":
-          printLine("SESSION TERMINATED.");
-          input.disabled = true;
-          inputLine.style.display = "none";
-          break;
         case "DIR":
-          printLine("Directory of /docs");
           files.forEach(f => printLine(`- ${f}`));
           break;
         case "BLEEN DIAL":
@@ -145,17 +134,15 @@
           if (upper.startsWith("OPEN ")) {
             const file = cmd.slice(5).trim();
             if (files.includes(file)) {
-              printLine(`Opening ${file}...`);
               window.open(`docs/${file}`, '_blank');
             } else {
               printLine("FILE NOT FOUND");
             }
           } else if (upper.startsWith("AT")) {
-            if (!adminMode) {
-              printLine("ACCESS DENIED. LOGIN REQUIRED.");
-              return;
-            }
-            fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`)
+            fetch(`${endpoint}/api/modem?cmd=${encodeURIComponent(cmd)}`, {
+              method: 'GET',
+              headers: { 'Accept': 'text/plain' }
+            })
               .then(res => res.text())
               .then(txt => printLine(txt))
               .catch(() => printLine("QRT LINK ERROR"));
@@ -168,7 +155,7 @@
     input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         const cmd = input.value.trim();
-        printLine("> " + cmd);
+        printLine("\n> " + cmd);
         input.value = "";
         handleCommand(cmd);
       }
@@ -178,3 +165,41 @@
   </script>
 </body>
 </html>
+----- END OF FILE -----
+
+
+----- START OF FILE: qrt_modem_server.py -----
+from flask import Flask, request, Response
+import serial
+import time
+
+app = Flask(__name__)
+modem = serial.Serial('COM6', 9600, timeout=1)
+
+@app.route('/api/modem')
+def modem_command():
+    cmd = request.args.get('cmd', '')
+    if not cmd:
+        return "No command provided", 400
+
+    print(f"Received modem command: {cmd}")
+    modem.write((cmd + "\r").encode())
+    time.sleep(1)
+    response = modem.read_all().decode(errors='ignore')
+    print(f"Modem response: {response}")
+    return Response(response if response else "\nOK", mimetype='text/plain')
+
+@app.route('/api/handshake')
+def modem_handshake():
+    modem.write(b'ATA\r')
+    time.sleep(1)
+    response = modem.read_all().decode(errors='ignore')
+    return Response(response if response else "NO RESPONSE", mimetype='text/plain')
+
+@app.errorhandler(404)
+def not_found(e):
+    return Response("404: Not Found — Flask is running, but this route doesn't exist.", status=404, mimetype='text/plain')
+
+if __name__ == '__main__':
+    app.run(port=5050)
+----- END OF FILE -----
