@@ -81,28 +81,11 @@ main {
   border-radius: 6px;
   box-shadow: 0 0 12px rgba(0, 255, 225, 0.3);
   max-width: 300px;
-}
 
-.contact-content {
-  position: relative;
-}
-
-.contact-box .close {
-  position: absolute;
-  top: 0;
-  right: 8px;
-  cursor: pointer;
-  font-size: 18px;
-  color: #aaa;
-}
-
-.contact-box .close:hover {
-  color: #00ffe1;
-}
-
-.contact-box a {
-  color: #00ffe1;
-  text-decoration: underline;
+  /* 🔧 Prevent overflow */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 /* ✅ About Box Styles */
