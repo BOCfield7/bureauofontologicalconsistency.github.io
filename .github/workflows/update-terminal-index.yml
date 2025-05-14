@@ -1,0 +1,26 @@
+name: Update Terminal Index
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate boc_terminal_dir_index.txt
+        run: |
+          cd docs
+          ls *.pdf *.txt 2>/dev/null | sort > boc_terminal_dir_index.txt
+
+      - name: Commit updated index
+        run: |
+          git config user.name "boc-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs/boc_terminal_dir_index.txt
+          git commit -m "Auto-update terminal index"
+          git push
