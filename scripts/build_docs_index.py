@@ -48,7 +48,7 @@ def write_index(folder: Path, title: str, entries_html: str):
 </head>
 <body>
   <h1>{title}</h1>
-  <a class="back" href="{ './' if folder == DOCS else '../' }">← Back</a>
+  <a class="back" href="{ '/' if folder == DOCS else '../' }">← Back</a>
 
   {entries_html}
 
