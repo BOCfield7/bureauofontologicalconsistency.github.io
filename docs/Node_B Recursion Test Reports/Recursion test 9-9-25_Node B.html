@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><title>Recursion Test Report</title></head>
+    <body>
+      <h1>Recursion Test Report</h1>
+      <p><strong>Audio file:</strong> bleen_with_quantum_input_float32.wav</p>
+      
+    <table border="1" style="border-collapse:collapse">
+            <tr><th>Check</th><th>Value A</th><th>Value B</th><th>Match?</th></tr>
+<tr><td>Baseline Lock vs Key</td><td style='font-family:monospace'>3ad556ba8a2aad3a5f74a614997841d4</td><td style='font-family:monospace'>bf35b1ee2694694b41181106e71ec3dd</td><td style='text-align:center;background-color:#ffcdd2'>❌</td></tr>
+<tr><td>Final Lock vs Key</td><td style='font-family:monospace'>60eadaf6be28b656062e34e0cb8c7c7d</td><td style='font-family:monospace'>65f6087e8c844d8e66c428bbd6e46b84</td><td style='text-align:center;background-color:#ffcdd2'>❌</td></tr>
+<tr><td>Baseline vs Final Lock</td><td style='font-family:monospace'>3ad556ba8a2aad3a5f74a614997841d4</td><td style='font-family:monospace'>60eadaf6be28b656062e34e0cb8c7c7d</td><td style='text-align:center;background-color:#ffcdd2'>❌</td></tr>
+<tr><td>Baseline vs Final Key</td><td style='font-family:monospace'>bf35b1ee2694694b41181106e71ec3dd</td><td style='font-family:monospace'>65f6087e8c844d8e66c428bbd6e46b84</td><td style='text-align:center;background-color:#ffcdd2'>❌</td></tr>
+</table>
+<h2>Live TEKP Loop Comparison</h2>
+<p><em>Note: A match between Live and Static TEKP hash indicates a <strong>Recursion Event</strong>, which should not occur in a purely deterministic system. A mismatch is considered normal deterministic behavior.</em></p>
+<table border='1' style='border-collapse:collapse'>
+<tr><th>Loop</th><th>Hash A</th><th>Hash B</th><th>Δ A</th><th>Δ B</th><th>Centroid(s)</th><th>Result</th><th>Recursion/Dynamic State</th></tr>
+<tr><td>1</td><td style='font-family:monospace'>4dc47cd504aae06fcd59bd0f7154f44cb31af68ab7c29a4006828562b4aa057b</td><td style='font-family:monospace'>4dc47cd504aae06fcd59bd0f7154f44cb31af68ab7c29a4006828562b4aa057b</td><td>0</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>2</td><td style='font-family:monospace'>91f86905bc080a6c5f4cd4cc0143605e12f7453dee589693f17be42c15c27dde</td><td style='font-family:monospace'>91f86905bc080a6c5f4cd4cc0143605e12f7453dee589693f17be42c15c27dde</td><td>0</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>3</td><td style='font-family:monospace'>e8529d833735541285f7447df0e74ae0b1eaaaa3604a88f4ceb7a12556804006</td><td style='font-family:monospace'>969be51fbba7ccd47e5b7874730055f38b1111b60e8ad2f2f98f36f3898f07c0</td><td>-2</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>4</td><td style='font-family:monospace'>55801ba882a04563c5c611131e8a12e84befd0ce638c70aa150962bc0fc43656</td><td style='font-family:monospace'>55801ba882a04563c5c611131e8a12e84befd0ce638c70aa150962bc0fc43656</td><td>0</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>5</td><td style='font-family:monospace'>65ecf11ffdab7939f6eac3d60f549542b7491f5869ad564daa02ffd4928f2d7c</td><td style='font-family:monospace'>329dd53642c9ad77426bff38a7058ee995b7cac96682b9dd2e8d025ecb42ca68</td><td>1</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>6</td><td style='font-family:monospace'>a75602fcd24476624119cf370bbba9b55a393b72a0158a9c1bd11f96044585d9</td><td style='font-family:monospace'>7fbcdbc5f536fa200d44709a9923d9475feb445b8ac003f4071c6e38e272c713</td><td>-1</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>7</td><td style='font-family:monospace'>9e95a8b9a098cec95b943ec79ed284fd838cc49dad2b19d5c040e69ba9b5b199</td><td style='font-family:monospace'>0052976919d7420fa963447ab5e0348f6d172e6ec43e74fe633260aa1cb00a9d</td><td>1</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>8</td><td style='font-family:monospace'>e9512896081c4d0a74ef9b9b392f1d116cd2b8985332680379022654bfa02fa6</td><td style='font-family:monospace'>8195d32acf1fe1a8cad3f0e3345db071fb996317d03f0a7a7f45f3d30134eb41</td><td>1</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>9</td><td style='font-family:monospace'>1f98aab497dc9278c171530e7d2c886f9d3be72b42ed0b1bd9e8d88c49800dad</td><td style='font-family:monospace'>1f98aab497dc9278c171530e7d2c886f9d3be72b42ed0b1bd9e8d88c49800dad</td><td>0</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+<tr><td>10</td><td style='font-family:monospace'>48b2ca037abe39f90cad1b176090089b293b5336f7b2bf635f48b5c00fef398f</td><td style='font-family:monospace'>5da6f2176acf7e94b2e10180d9ed5abf929c6f90a1089e2fb2ac1e663e45607d</td><td>1</td><td></td><td></td><td>Temporal State Normal (Live hash ≠ Static hash)</td><td>Normal Deterministic State (Live hash ≠ Static hash)</td></tr>
+</table>
+<h2>Tone Injection Summary</h2>
+<pre style='background:#f4f4f4;padding:10px;border:1px solid #ccc;'>
+</pre>
+<h2>Spectral Drift Snapshots (Aether Plot)</h2>
+<p><strong>Loop 1:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_01.png' width='800'><br></p>
+<p><strong>Loop 2:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_02.png' width='800'><br></p>
+<p><strong>Loop 3:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_03.png' width='800'><br></p>
+<p><strong>Loop 4:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_04.png' width='800'><br></p>
+<p><strong>Loop 5:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_05.png' width='800'><br></p>
+<p><strong>Loop 6:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_06.png' width='800'><br></p>
+<p><strong>Loop 7:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_07.png' width='800'><br></p>
+<p><strong>Loop 8:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_08.png' width='800'><br></p>
+<p><strong>Loop 9:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_09.png' width='800'><br></p>
+<p><strong>Loop 10:</strong><br>
+<img src='file:///C:/Users/Demitrius/Desktop/QRT Interface for Node B/aether_snapshots/aether_loop_10.png' width='800'><br></p>
+</body></html>
