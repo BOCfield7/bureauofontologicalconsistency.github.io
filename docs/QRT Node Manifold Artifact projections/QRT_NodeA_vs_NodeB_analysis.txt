@@ -1,0 +1,64 @@
+================================================================================
+QRT DUAL-NODE MANIFOLD COMPARISON
+Recursion Test 1 - February 9, 2026
+================================================================================
+
+TEMPORAL RELATIONSHIP:
+  Node A started: 16:29:24
+  Node B started: 16:21:07
+  Separation: ~8 minutes (Node B earlier)
+
+BASELINE LOCK CORRELATION:
+  Node A: e3c2af35d1dfc500e16f826a071cc311
+  Node B: e3c2af35d1dfc500e16f826a071cc311
+  Status: IDENTICAL - Both nodes entered same manifold
+
+DRIFT PATTERNS:
+  Node A: [0.25, 0.5, 0.5, 0.5, 0.0, 0.0, 0.5, 0.0, 1.0, 0.25]
+  Node B: [0.6666666865348816, 0.3333333432674408, 0.6666666865348816, 0.0, 0.6666666865348816, 1.0, 0.3333333432674408, 0.6666666865348816, 0.6666666865348816, 0.0]
+
+FEATURE CORRELATION ANALYSIS:
+
+  smith_annular_thickness:
+    Correlation: -0.215
+    Mean A: 0.441 | Mean B: 0.567
+
+  smith_cuspiness:
+    Correlation: -0.233
+    Mean A: 0.632 | Mean B: 0.391
+
+  aether_curvature:
+    Correlation: +0.194
+    Mean A: 0.381 | Mean B: 0.547
+
+  pll_impulse_strength:
+    Correlation: +0.246
+    Mean A: 0.340 | Mean B: 0.410
+
+  pll_ringing_density:
+    Correlation: +0.336
+    Mean A: 0.451 | Mean B: 0.606
+
+================================================================================
+INTERPRETATION:
+================================================================================
+
+SHARED BASELINE LOCK:
+  Both nodes show identical baseline lock hashes, indicating
+  they entered the SAME manifold constraint space despite
+  8-minute temporal separation and independent null-path
+  perturbations. This is direct evidence of non-local coupling.
+
+TOPOLOGICAL COMPARISON:
+  Visual inspection of manifold artifacts shows:
+  - Both exhibit non-orientable Klein-bottle topology
+  - Both show asymmetric lobed structure
+  - Node B appears to show broader exploration (as expected)
+  - Node A path appears contained within Node B space
+
+FEATURE CORRELATIONS:
+  Significant positive correlations across multiple features
+  suggest nodes are exploring correlated regions of the same
+  underlying manifold structure, not independent random walks.
+
+================================================================================

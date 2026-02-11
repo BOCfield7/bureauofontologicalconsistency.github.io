@@ -1,0 +1,138 @@
+{
+  "pipeline": "QRT Manifold Pipeline CANONICAL v1.0",
+  "node": "Node_A",
+  "loop_count": 10,
+  "seed": 1337,
+  "config": {
+    "node": "Node_A",
+    "loop_count": 10,
+    "seed": 1337,
+    "carrier_a": 2.0,
+    "carrier_b": 1.0,
+    "strand_count_per_loop": 9,
+    "u_samples": 900,
+    "dpi": 300,
+    "figsize_in": [
+      10.5,
+      10.5
+    ]
+  },
+  "inputs": {
+    "aether": {
+      "aether_loop_01.png": "a2341874d391f8399c8a06753b512465c7aeac5e928f45004208e3771eac83fd",
+      "aether_loop_02.png": "4efe791d6b580d21a84f868d98c4c8e6f6ffc2367a6944b3de35a0d782b0ce7c",
+      "aether_loop_03.png": "4c908a04fb221b8078a1f273d3ceb6c818542f77654816d556585b651ae48282",
+      "aether_loop_04.png": "0e59d0d6fbb95e00d5ab8dc8c1b1804ed365617e63b18682fff2e682972eb452",
+      "aether_loop_05.png": "905ee6371988f2f5b08271fe2e123d8e9c86a2bd76e685a2f676041d27f1949e",
+      "aether_loop_06.png": "2b4d97ba29a3aac33c95ebfde9cc6305fd5c1d605b5dca0c6395c00ce37d9a69",
+      "aether_loop_07.png": "642d17882324d7350dcd42a48773b1e08795d042826eb7280b9a66f5e7fb7dae",
+      "aether_loop_08.png": "ed1837d9ae6067e2a302c950f205061cbeb90403ae71c9a101166f11390ed56a",
+      "aether_loop_09.png": "73865979ef834d73f8bb782f636a9aa65ae11cfb4c825f09a152e4dfdfa69bd7",
+      "aether_loop_10.png": "d238e6d1324f796d7fafba5ee0264fa7e69c2228f33c08eb9ccaf7f4705b693e"
+    },
+    "smith": {
+      "smith_loop_01.png": "92f362904c5d9418cfefc1e4dc521bf6d1bf04289c446ea99205c3f1a13e7b29",
+      "smith_loop_02.png": "e7ce1202b8e0789f02e3ce6bd64355d1b8f95b4bb33fa48784880ba668e78afd",
+      "smith_loop_03.png": "f44b59644be4a9f5a2ddff9d494840754b2c76a8f6055b50c4cad5eac81acae8",
+      "smith_loop_04.png": "3f5cf7459e649bca7830fd7931e094d5fd1e9768f9e729f0d28eed0b43bc4e42",
+      "smith_loop_05.png": "59b3944162743829f7503209e0e3ef21d12123f245c1152d738adfd1e7b265fe",
+      "smith_loop_06.png": "2b832b4f20494c2ba46a70c2b49f36246c4cb51583dedc25aca1b5eeaef7767b",
+      "smith_loop_07.png": "5c9d2f26e360afe08ee2322af09520dbc90e4c7f68507941a1e4a7543f8abf78",
+      "smith_loop_08.png": "ce918a9c10a7251fe75420fb45e707ccae10d4c3de2b6de99beec1c71bece01e",
+      "smith_loop_09.png": "e100e41937711529d816fd54b79eb8c3ad6c2533df09b81afaabba796fe49b39",
+      "smith_loop_10.png": "21561cc487d8992bdd97243d21b5516bb19c233d601202528504688f82141c79"
+    },
+    "pll": {
+      "pll_loop_01.png": "a2341874d391f8399c8a06753b512465c7aeac5e928f45004208e3771eac83fd",
+      "pll_loop_02.png": "4efe791d6b580d21a84f868d98c4c8e6f6ffc2367a6944b3de35a0d782b0ce7c",
+      "pll_loop_03.png": "4c908a04fb221b8078a1f273d3ceb6c818542f77654816d556585b651ae48282",
+      "pll_loop_04.png": "0e59d0d6fbb95e00d5ab8dc8c1b1804ed365617e63b18682fff2e682972eb452",
+      "pll_loop_05.png": "905ee6371988f2f5b08271fe2e123d8e9c86a2bd76e685a2f676041d27f1949e",
+      "pll_loop_06.png": "2b4d97ba29a3aac33c95ebfde9cc6305fd5c1d605b5dca0c6395c00ce37d9a69",
+      "pll_loop_07.png": "642d17882324d7350dcd42a48773b1e08795d042826eb7280b9a66f5e7fb7dae",
+      "pll_loop_08.png": "ed1837d9ae6067e2a302c950f205061cbeb90403ae71c9a101166f11390ed56a",
+      "pll_loop_09.png": "73865979ef834d73f8bb782f636a9aa65ae11cfb4c825f09a152e4dfdfa69bd7",
+      "pll_loop_10.png": "d238e6d1324f796d7fafba5ee0264fa7e69c2228f33c08eb9ccaf7f4705b693e"
+    },
+    "drift_json": "qrt_test/drift.json"
+  },
+  "feature_summary_norm": {
+    "smith_annular_thickness": [
+      0.9999976754188538,
+      0.29954394698143005,
+      0.0018213618313893676,
+      0.15943920612335205,
+      0.5962157845497131,
+      0.0,
+      0.7429755330085754,
+      0.31775757670402527,
+      0.8432204723358154,
+      0.45057687163352966
+    ],
+    "smith_cuspiness": [
+      0.760375440120697,
+      1.0,
+      0.8915485739707947,
+      0.7955164313316345,
+      0.21542194485664368,
+      0.8651476502418518,
+      0.0,
+      0.8047664165496826,
+      0.631704568862915,
+      0.3544204831123352
+    ],
+    "aether_curvature": [
+      0.8608998656272888,
+      0.12784016132354736,
+      0.05283766984939575,
+      0.9999998807907104,
+      0.3022938072681427,
+      0.6597796082496643,
+      0.0,
+      0.48141661286354065,
+      0.02065180614590645,
+      0.303676038980484
+    ],
+    "pll_impulse_strength": [
+      0.29263031482696533,
+      0.10266367346048355,
+      0.19867761433124542,
+      0.9957694411277771,
+      0.0,
+      0.23600421845912933,
+      0.30766820907592773,
+      0.13351882994174957,
+      0.1365755796432495,
+      1.0
+    ],
+    "pll_ringing_density": [
+      0.9999998807907104,
+      0.09682391583919525,
+      0.0,
+      0.987604022026062,
+      0.3876021206378937,
+      0.5454618334770203,
+      0.6971322298049927,
+      0.23960857093334198,
+      0.4172007739543915,
+      0.1355535089969635
+    ],
+    "drift": [
+      0.25,
+      0.5,
+      0.5,
+      0.5,
+      0.0,
+      0.0,
+      0.5,
+      0.0,
+      1.0,
+      0.25
+    ]
+  },
+  "validation": {
+    "closed_object": true,
+    "non_orientable": true,
+    "representation_class": "Klein-bottle class carrier with loop-strand bundles; topology-first; no time axis"
+  }
+}
